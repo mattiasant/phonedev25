@@ -1,6 +1,33 @@
-# Five papers
+#  Five Papers - A Quirky 1v1 Card Game
 
-A repository for Mobile App Development course. 
+**Five Papers** is a turn-based card game where players face off against an opponent using a set of cards. Strategy, randomness, and creativity are all part of the gameplay, offering a fun and unpredictable experience.
 
-Soon to be updated.
+---
 
+##  Team Members & Roles
+
+| Name    | Role                        |
+|---------|-----------------------------|
+| Robyn   |  Lead Developer, Presenter  |
+| Mirko   |  Editor, Researcher         |
+| Mattias |  Project Leader / Manager   |
+
+---
+
+##  Planned Features
+
+-  **Turn-based gameplay** against other human opponent
+-  **Unique cards with quirky effects** 
+-  **Randomized card deck** generation for each match
+-  **Special power cards** that trigger surprising outcomes
+-  **Match history or log** to show played cards and effects
+
+---
+
+##  Tools & Frameworks
+
+- **Kotlin**
+- **Android Studio**
+- **Jetpack Compose** for UI
+- **Room Database** (for storing card decks, match history)
+- **Figma** (for wireframes and mockups)
