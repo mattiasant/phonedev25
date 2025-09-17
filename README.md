@@ -31,3 +31,4 @@
 - **Jetpack Compose** for UI
 - **Room Database** (for storing card decks, match history)
 - **Figma** (for wireframes and mockups)
+- [Figma link](https://www.figma.com/design/Ni4zeqOqTy7wsBcOYQe12F/Five-Papers-Phone-game?node-id=0-1&t=NPVLGzjtBzi1af7y-1)
