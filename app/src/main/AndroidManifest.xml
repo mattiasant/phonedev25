@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Phonedev25">
         <activity
+            android:name=".GameSettingsPage"
+            android:exported="false" />
+        <activity
+            android:name=".StatisticsPage"
+            android:exported="false" />
+        <activity
+            android:name=".StorePage"
+            android:exported="false" />
+        <activity
             android:name=".Join_Game"
             android:exported="false" />
         <activity
