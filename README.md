@@ -8,7 +8,7 @@
 
 | Name    | Role                        |
 |---------|-----------------------------|
-| Robyn   |  Lead Developer, Presenter  |
+| Robyn   |  Lead Developer, Presenter, Database management  |
 | Mirko   |  Editor, Researcher         |
 | Mattias |  Project Leader / Manager   |
 
