@@ -11,9 +11,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import ut.cs.ee.phonedev25.data.local.GameDatabase
+import ut.cs.ee.phonedev25.data.repository.GameRepository
 import ut.cs.ee.phonedev25.ui.theme.Phonedev25Theme
 
 class MainActivity : ComponentActivity() {
+
+    val database: GameDatabase by lazy {
+        GameDatabase.getDatabase(this)
+    }
+
+    val repository = GameRepository(
+        database.gameItemDao(),
+        database.matchHistoryDao(),
+        database.matchActionDao()
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
