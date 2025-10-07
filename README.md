@@ -8,7 +8,7 @@
 
 | Name    | Role                        |
 |---------|-----------------------------|
-| Robyn   |  Lead Developer, Presenter, Database management  |
+| Robyn [Anyro0](https://github.com/Anyro0))  |  Lead Developer, Presenter, Database management  |
 | Mirko   |  Editor, Researcher         |
 | Mattias |  Project Leader / Manager   |
 
