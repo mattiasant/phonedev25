@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.Phonedev25" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Base theme for XML-based screens -->
+    <style name="Theme.Phonedev25" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize colors or text here if you want -->
+        <item name="android:colorBackground">#FFFFFF</item>
+        <item name="android:textColorPrimary">#000000</item>
+    </style>
 </resources>
