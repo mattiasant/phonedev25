@@ -6,11 +6,11 @@
 
 ##  Team Members & Roles
 
-| Name    | Role                        |
-|---------|-----------------------------|
-| Robyn ([Anyro0](https://github.com/Anyro0))  |  Lead Developer, Presenter, Database management  |
-| Mirko ([mamikek](https://github.com/mamikek))  |  Editor, Researcher         |
-| Mattias ([mattiasant](https://github.com/mattiasant)) |  Project Leader / Manager   |
+| Name    | Role                                           |
+|---------|------------------------------------------------|
+| Robyn ([Anyro0](https://github.com/Anyro0))  | Lead Developer, Presenter, Database management |
+| Mirko ([mamikek](https://github.com/mamikek))  | Editor, Researcher, Designer                    |
+| Mattias ([mattiasant](https://github.com/mattiasant)) | Project Leader / Manager                       |
 
 ---
 
