@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Phonedev25">
         <activity
+            android:name=".gameArena"
+            android:exported="false" />
+        <activity
             android:name=".GameSettingsPage"
             android:exported="false" />
         <activity
@@ -30,6 +33,7 @@
             android:theme="@style/Theme.Phonedev25">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
