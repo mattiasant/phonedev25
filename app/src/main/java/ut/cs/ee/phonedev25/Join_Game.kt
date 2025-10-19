@@ -1,6 +1,8 @@
 package ut.cs.ee.phonedev25
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -24,6 +26,10 @@ class Join_Game : AppCompatActivity() {
 
         findViewById<TextView>(R.id.back_text).setOnClickListener {
             finish()
+        }
+
+        findViewById<Button>(R.id.startGame).setOnClickListener {
+            startActivity(Intent(this, gameArena::class.java))
         }
     }
 }

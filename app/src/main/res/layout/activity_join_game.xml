@@ -11,16 +11,15 @@
         android:id="@+id/startGame"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="55dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginStart="56dp"
         android:layout_marginEnd="55dp"
+        android:layout_marginBottom="26dp"
         android:background="@drawable/custom_button"
         android:text="Start Game"
         android:textSize="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/imageView5"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/players_LinearLayout" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/back_text"
@@ -75,27 +74,11 @@
         android:layout_marginStart="61dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="61dp"
-        android:layout_marginBottom="27dp"
         android:text="Join Game"
         android:textSize="60sp"
-        app:layout_constraintBottom_toTopOf="@+id/players_LinearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/back_text" />
-
-    <LinearLayout
-        android:id="@+id/players_LinearLayout"
-        android:layout_width="280dp"
-        android:layout_height="243dp"
-        android:layout_marginStart="62dp"
-        android:layout_marginTop="27dp"
-        android:layout_marginEnd="63dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/joinGame_text">
-
-    </LinearLayout>
 
     <ImageView
         android:id="@+id/imageView3"
