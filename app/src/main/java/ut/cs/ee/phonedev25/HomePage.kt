@@ -20,7 +20,7 @@ class HomePage : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.playNupp).setOnClickListener {
-            startActivity(Intent(this, Join_Game::class.java))
+            startActivity(Intent(this, JoinGame::class.java))
         }
         findViewById<Button>(R.id.statsNupp).setOnClickListener {
             startActivity(Intent(this, StatisticsPage::class.java))
