@@ -1,4 +1,4 @@
-#  Step 2 Report — Data Storage / UI & Navigation
+#  Step 3 Report — API Integration
 
 ## Project Title
 **5 Papers**
@@ -15,8 +15,7 @@
 
 ## 1. API
 
-For Step 3, the project integrates a **public QR generation API** —  
-[`api.qrserver.com`](https://api.qrserver.com/v1/create-qr-code/).
+For Step 3, the project integrates a **public QR generation API** —  [`api.qrserver.com`](https://api.qrserver.com/v1/create-qr-code/).
 
 This API is completely (at the time of creation) **open and keyless**, returning a **PNG image** of a QR code generated from input text.  
 Example endpoint used: https://api.qrserver.com/v1/create-qr-code/?data=JoinCode:1234&size=200x200  
@@ -52,17 +51,17 @@ Displayed in popup dialog (Join_Game screen)
 
 ## 4. Live Data Display and Error Handling
 
-### 🧩 Live Data Display
+### Live Data Display
 - The QR image is rendered **in a popup dialog** on the *Join Game* screen.
 - Each button press generates a **new random join code**, ensuring unique output every time.
 
-### ⚠️ Error Handling
+### Error Handling
 - Network errors are caught with `try/catch` in `QrViewModel`.
 - Errors are exposed via a `MutableLiveData<String>` and displayed as **Toast messages**.
 - The app shows a **toast** (“Generating QR…”) during the loading state and remains crash-free offline.
 
 
-## 6. Local vs Remote Processing
+## 5. Local vs Remote Processing
 
 | Feature | Source | Description |
 |----------|---------|-------------|
