@@ -29,7 +29,7 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 
 
-class JoinGame : AppCompatActivity() {
+class Join_Game : AppCompatActivity() {
 
     private val qrViewModel: QrViewModel by viewModels()
     private var activeDialog: AlertDialog? = null

@@ -43,15 +43,15 @@ object Deck {
         Card("Risti", "Äss", 14, R.drawable.risti1),
 
         //RUTU 6-14
-        Card("Ärtu", "6", 6, R.drawable.rutu6),
-        Card("Ärtu", "7", 7, R.drawable.rutu7),
-        Card("Ärtu", "8", 8, R.drawable.rutu8),
-        Card("Ärtu", "9", 9, R.drawable.rutu9),
-        Card("Ärtu", "10", 10, R.drawable.rutu10),
-        Card("Ärtu", "Soldat", 11, R.drawable.rutu11),
-        Card("Ärtu", "Emand", 12, R.drawable.rutu12),
-        Card("Ärtu", "Kuningas", 13, R.drawable.rutu13),
-        Card("Ärtu", "Äss", 14, R.drawable.rutu1),
+        Card("Rutu", "6", 6, R.drawable.rutu6),
+        Card("Rutu", "7", 7, R.drawable.rutu7),
+        Card("Rutu", "8", 8, R.drawable.rutu8),
+        Card("Rutu", "9", 9, R.drawable.rutu9),
+        Card("Rutu", "10", 10, R.drawable.rutu10),
+        Card("Rutu", "Soldat", 11, R.drawable.rutu11),
+        Card("Rutu", "Emand", 12, R.drawable.rutu12),
+        Card("Rutu", "Kuningas", 13, R.drawable.rutu13),
+        Card("Rutu", "Äss", 14, R.drawable.rutu1),
 
     )
 }

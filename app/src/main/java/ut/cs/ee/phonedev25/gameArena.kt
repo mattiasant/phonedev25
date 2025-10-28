@@ -8,12 +8,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isEmpty
-import kotlinx.coroutines.delay
 import ut.cs.ee.phonedev25.data.Card
 import ut.cs.ee.phonedev25.data.Deck
 import android.widget.Button
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class gameArena : AppCompatActivity() {
 
@@ -22,7 +22,6 @@ class gameArena : AppCompatActivity() {
     private lateinit var drawableDeck: MutableList<Card>
 
     private var selectedImageView: ImageView? = null
-    private var myCurrentCard: Card? = null
     private lateinit var cardPlacement: ImageView
     private lateinit var rundekaartTextView: TextView
     private lateinit var kaitsekaartTextView: TextView
@@ -75,6 +74,8 @@ class gameArena : AppCompatActivity() {
         //------------------------------GAME------------------------------------
 
         // vaated
+        enemyCardsLayout = findViewById(R.id.enemyCardsLayout)
+        myCardsLayout = findViewById(R.id.myCardsLayout)
         cardPlacement = findViewById(R.id.card_placement)
         rundekaartTextView = findViewById(R.id.rundekaart)
         kaitsekaartTextView = findViewById(R.id.kaitsekaart)
@@ -82,16 +83,17 @@ class gameArena : AppCompatActivity() {
         randomCardImage = findViewById(R.id.randomCard)
         cardsLeftTextView = findViewById(R.id.cardsLeft)
 
+        //------------------------------Trump part------------------------------------
+
         trumpCardImage = findViewById(R.id.trumpCard)
         gameInfoTextView = findViewById(R.id.gameInfo)
-        killButton = findViewById(R.id.killButton)
 
         setupTrumpCardTakeListener(myCardsLayout)
-        setupKillButtonListener(myCardsLayout) // Uus funktsioon "Kill" nupule
+
+        //------------------------------UI update------------------------------------
 
         // Uuenda UI-d vastavalt algsele olekule
         updateGameUI()
-
 
         // Jagame vastase kaardid ja eemaldame need pakist
         enemyCards = drawableDeck.take(5).toMutableList()
@@ -102,6 +104,7 @@ class gameArena : AppCompatActivity() {
         // Eemaldame ka mängija kaardid pakist
         drawableDeck.subList(0, 5).clear()
 
+        //------------------------------GIVE CARDS------------------------------------
 
         for (i in 1..5) {
             addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
@@ -124,41 +127,39 @@ class gameArena : AppCompatActivity() {
             Toast.makeText(this, "Trumbimast on: $trumpSuit", Toast.LENGTH_LONG).show()
         }
 
+        //------------------------------GAME LISTENER------------------------------------
+
         // * MUUDATUS NR. 4: Kutsume välja uue kaardi võtmise funktsiooni
         setupPlaceButtonListener(myCardsLayout)
         setupRandomCardListener(myCardsLayout)
 
     }
 
+    //Game disables buttons when AI is thinking and doing its part.
     private fun updateGameUI() {
         when (currentTurn) {
             GameTurn.PLAYER_ATTACK -> {
                 gameInfoTextView.text = "Sinu kord rünnata!"
                 placeButton.isEnabled = true
-                killButton.isEnabled = false // Ei saa "võtta", kui ise ründad
             }
             GameTurn.ENEMY_DEFEND -> {
                 gameInfoTextView.text = "Vastane kaitseb..."
                 placeButton.isEnabled = false // Keela nupud, kuni AI mõtleb
-                killButton.isEnabled = false
             }
             GameTurn.ENEMY_ATTACK -> {
                 gameInfoTextView.text = "Vastane ründab!"
                 placeButton.isEnabled = false // AI ründab, sina ei saa "Place" panna
-                killButton.isEnabled = false
             }
             GameTurn.PLAYER_DEFEND -> {
                 gameInfoTextView.text = "Sinu kord kaitsta!"
                 placeButton.isEnabled = true // "Place" nupp on nüüd kaitseks
-                killButton.isEnabled = true // "Kill" nupp on kaartide võtmiseks
             }
         }
     }
 
-    //Loome funktsiooni, mis lisab kaardid layouti.
-    // TÄHELEPANU: Lisa funktsioonile kolmas parameeter: Card objekt, mis võib olla ka null!
+    //Inserts cards to layout panel.
     private fun addCardImageToLayout(layout: LinearLayout, drawableId: Int, card: Card? = null) {
-        // 1. Veendu, et layout on horisontaalne, et kaalud töötaksid laiuse jaotamisel
+        //Checks layout orientation
         if (layout.orientation != LinearLayout.HORIZONTAL) {
             layout.orientation = LinearLayout.HORIZONTAL
         }
@@ -168,88 +169,72 @@ class gameArena : AppCompatActivity() {
 
         val density = resources.displayMetrics.density
 
-        // Määra kaardi proportsioon, et kaardi pilt ei veniks
+        // Checks if the card is not streched.
         imageView.adjustViewBounds = true
         imageView.scaleType = ImageView.ScaleType.FIT_CENTER // Või FIT_XY olenevalt soovist
 
-        // Kui funktsioon sai kaasa Card objekti (st kaart ei ole vastase oma), siis
-        // lisame selle ImageView külge tag'iks.
         if (card != null) {
             imageView.tag = card
         }
 
-        // Lisame klikikuulaja AINULT mängija kaartide layoutile
+        // Click listener for that the user knows that a card has been selected
         if (layout.id == R.id.myCardsLayout) {
 
             imageView.setOnClickListener { clickedView ->
-                // Kui palju kaarti üles liigutada (negatiivne väärtus liigub üles)
-                // Kasutame 30dp väärtust, mis on teisendatud piksliteks
+                // Moves card upward about 30 pixels
                 val moveUpDistancePx = (-30 * density)
 
-                // Kontrollime, kas klikitud kaart ON juba valitud kaart
+                // Checks if the card is selected
                 if (clickedView == selectedImageView) {
-                    // JAH: See ON juba valitud. Tühistame valiku.
+                    // If its been selected then it ignores
                     clickedView.translationY = 0f
                     selectedImageView = null
                 } else {
-                    // EI: See EI OLE valitud kaart. Valime selle.
-
-                    // 1. Liiguta eelmine valitud kaart (kui see eksisteeris) tagasi alla
+                    //Otherwise bring back/keep down
                     selectedImageView?.translationY = 0f
-
-                    // 2. Liiguta ÄSJA klikitud kaart üles
                     clickedView.translationY = moveUpDistancePx
-
-                    // 3. Salvesta see vaade kui uus valitud kaart
                     selectedImageView = clickedView as ImageView
                 }
             }
         }
 
-        // 2. Kasuta kaalumist (weight) laiuse automaatseks jaotamiseks
-        val kaal = 1f
-
         // Määra kaardile marginaalid
         val marginEndPx = (4 * density).toInt() // 4dp vahet kaartide vahel
 
-        // Loome LayoutParams-id
+        // Create LayoutParams-id
         val params = LinearLayout.LayoutParams(
             0,
             LinearLayout.LayoutParams.WRAP_CONTENT,
-            kaal
+            1f
         )
 
-        // Lisa marginaal
+        // Add margin so the placement looks smooth or better. Not together pushed.
         params.marginEnd = marginEndPx
-
         imageView.layoutParams = params
-
-        // 3. Lõpuks lisage pilt layouti
-        layout.addView(imageView)
+        layout.addView(imageView) //Adds the card picture
     }
-
     private fun setupRandomCardListener(myCardsLayout: LinearLayout) {
         randomCardImage.setOnClickListener {
-            // 1. Kontrolli, kas käes on vähem kui 4 kaarti
+            // Check if I have 5 cards on hand
             if (myCards.size >= 5) {
-                Toast.makeText(this, "Sul on juba 5 või rohkem kaarti käes!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "You already have 5 cards on hand", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 2. Kontrolli, kas kaarte on pakis
+            // Checks if there are any cards left at the playing deck
             if (drawableDeck.isEmpty()) {
-                Toast.makeText(this, "Kaardipakk on tühi!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "The card deck is empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 3. Võta kaardipaki esimene kaart
-            val newCard = drawableDeck.removeAt(0) // Eemaldab esimese kaardi pakist
+            //When we take a new card we take from the top, so we remove the first card on the array list.
+            val newCard = drawableDeck.removeAt(0)
 
-            // 4. Lisa kaart mängija kätte
+            // Give it to the player
             myCards.add(newCard)
             addCardImageToLayout(myCardsLayout, newCard.drawableID, newCard)
 
-            // 5. Uuenda kaardipaki arvu
+            // Update card deck number.
             cardsLeftTextView.text = "${drawableDeck.size}"
 
             Toast.makeText(this, "Võtsid kaardi: ${newCard.cardSuit} ${newCard.cardName}", Toast.LENGTH_SHORT).show()
@@ -258,32 +243,30 @@ class gameArena : AppCompatActivity() {
 
     private fun setupTrumpCardTakeListener(myCardsLayout: LinearLayout) {
         trumpCardImage.setOnClickListener {
-            // Kontroll 1: Kas kaart on juba ära võetud?
+            // Check if there exists a trump card.
             if (revealedTrumpCard == null) {
                 Toast.makeText(this, "Trumbikaart on juba võetud!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Kontroll 2: Kas pakk ON tühi?
+            // IF the deck is empty then the last trump card will be taken by the player or enemy.
             if (drawableDeck.isEmpty()) {
-                // Pakk on tühi, võtame kaardi endale
+                //We take the card
                 val cardToTake = revealedTrumpCard!! // !! sest me kontrollisime null'i esimeses if-is
 
-                // Lisa kaart andmetesse
                 myCards.add(cardToTake)
-                // Lisa kaart UI-sse
+                // add it to our cards
                 addCardImageToLayout(myCardsLayout, cardToTake.drawableID, cardToTake)
 
                 Toast.makeText(this, "Võtsid trumbikaardi: ${cardToTake.cardSuit} ${cardToTake.cardName}", Toast.LENGTH_SHORT).show()
 
-                // Tühjenda trumbikaardi pesa
-                revealedTrumpCard = null
-                trumpCardImage.setImageResource(0) // 0 eemaldab pildi
-                trumpCardImage.isClickable = false // Keela edasised klikid
+                revealedTrumpCard = null //empty the card thingy
+                trumpCardImage.setImageResource(0) // removes picture
+                trumpCardImage.isClickable = false // disables the clicking
 
             } else {
-                // Pakk pole veel tühi
-                Toast.makeText(this, "Pakk pole veel tühi!", Toast.LENGTH_SHORT).show()
+                // If the deck is not empty then the player cannot take it
+                Toast.makeText(this, "The Deck is not empty yet!", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -291,46 +274,46 @@ class gameArena : AppCompatActivity() {
     private fun setupPlaceButtonListener(myCardsLayout: LinearLayout) {
         placeButton.setOnClickListener {
 
-            // Kontrolli, kas kaart on valitud
+            // Check if the card has been seleted.
             if (selectedImageView == null) {
-                Toast.makeText(this, "Vali kõigepealt kaart!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Chose a card before placing it", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // --- MINU RÜNDE LOOGIKA ---
-            if (currentTurn == GameTurn.PLAYER_ATTACK) {
+            // ATTACKING LOGIC
+            if (currentTurn == GameTurn.PLAYER_ATTACK) { //if its my turn
 
-                val selectedCard = selectedImageView?.tag as Card
+                val selectedCard = selectedImageView?.tag as Card //use the selected card
+                myCardsLayout.removeView(selectedImageView) //removes the card from layout
+                myCards.remove(selectedCard) //removes it from the list
+                selectedImageView = null //deltes the image
 
-                // Eemalda kaart käest (UI ja andmed)
-                myCardsLayout.removeView(selectedImageView)
-                myCards.remove(selectedCard)
-                selectedImageView = null
-
-                // Pane kaart lauale
-                attackingCard = selectedCard
+                attackingCard = selectedCard //put it to the table and show it
                 cardPlacement.setImageResource(selectedCard.drawableID)
-                rundekaartTextView.text = "Rünne: ${selectedCard.cardSuit} ${selectedCard.cardName}"
-                kaitsekaartTextView.text = "Kaitse: ..."
+                rundekaartTextView.text = "Attacking: ${selectedCard.cardSuit} ${selectedCard.cardName}"
+                kaitsekaartTextView.text = "Defending: ..." //
 
-                // Muuda olekut: Vastane peab kaitsma
-                currentTurn = GameTurn.ENEMY_DEFEND
-                updateGameUI() // Uuenda nuppe ja teksti
+                currentTurn = GameTurn.ENEMY_DEFEND //Its now enemy's turn
+                updateGameUI() // update the UI and text
 
-                // Kutsu välja AI loogika
-                runEnemyLogic()
+                runEnemyLogic() //Call out the enemy's turn
             }
 
-            // --- MINU KAITSE LOOGIKA ---
-            else if (currentTurn == GameTurn.PLAYER_DEFEND) {
+            //DEFENCE LOGIC
+            else if (currentTurn == GameTurn.PLAYER_DEFEND) { //Its my turn
 
-                val selectedCard = selectedImageView?.tag as Card
+                //You need to defend.
+                if (defendingCard != null) {
+                    Toast.makeText(this, "You need to kill or attack again if there is no cards on the table", Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+
+                val selectedCard = selectedImageView?.tag as Card //Select the card imgae
 
                 // **Siia pead lisama reegli, kas sinu kaart lööb AI kaardi (attackingCard) ära!**
                 val canDefend = kasKaartLobA(selectedCard, attackingCard!!) // Pead ise looma selle funktsiooni!
 
-                if (canDefend) {
-                    // Kaart sobib kaitseks
+                if (canDefend) { //if the card can defend
                     myCardsLayout.removeView(selectedImageView)
                     myCards.remove(selectedCard)
                     selectedImageView = null
@@ -338,170 +321,148 @@ class gameArena : AppCompatActivity() {
                     defendingCard = selectedCard
                     // VÕI uuenda kaitsekaardi pilti, kui sul on eraldi pesa?
                     // Praegu uuendame lihtsalt teksti:
-                    kaitsekaartTextView.text = "Kaitse: ${selectedCard.cardSuit} ${selectedCard.cardName}"
+                    kaitsekaartTextView.text = "Defence: ${selectedCard.cardSuit} ${selectedCard.cardName}"
 
-                    // Kaardid on laualt maas (biito)
-                    Toast.makeText(this, "Kaitsesid edukalt!", Toast.LENGTH_SHORT).show()
-                    clearTableAfterTurn(attackerWon = false) // false = kaitsja võitis
+                    Toast.makeText(this, "Defence sucsessful!", Toast.LENGTH_SHORT).show()
 
-                    // Muuda olekut: Mängija ründab uuesti
-                    currentTurn = GameTurn.PLAYER_ATTACK
-                    updateGameUI()
+                    currentTurn = GameTurn.PLAYER_ATTACK //Its now enemy's turn
+                    updateGameUI() //Update UI
 
                 } else {
-                    // Kaart ei sobi
-                    Toast.makeText(this, "See kaart ei löö ründavat kaarti ära!", Toast.LENGTH_SHORT).show()
-                    // Ära tee midagi, lase mängijal uus kaart valida
+                    // If the selected card cannot defend or kill the enemy's card.
+                    Toast.makeText(this, "This card cannot defend, try another!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun setupKillButtonListener(myCardsLayout: LinearLayout) {
-        killButton.setOnClickListener {
-            // "Kill" nupp töötab ainult siis, kui mängija peab kaitsma
-            if (currentTurn != GameTurn.PLAYER_DEFEND) {
-                return@setOnClickListener
-            }
+    //This is waiting mechanism, so the enemy cards just don't teleport around in 1ms
+    private fun clearTableAfterTurnAndContinue(attackerWon: Boolean, nextTurn: GameTurn, delayAfterClear: Long) {
+        cardPlacement.setImageResource(0) // 0 = tühi pilt
+        rundekaartTextView.text = "Rünne:"
+        kaitsekaartTextView.text = "Kaitse:"
+        attackingCard = null
+        defendingCard = null
 
-            Toast.makeText(this, "Võtsid kaardi endale!", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch { //Waiting and updates the mechanics and UI in the game
+            kotlinx.coroutines.delay(delayAfterClear)
 
-            // Lisa ründav kaart (ja potentsiaalselt teised laual olevad kaardid) endale kätte
-            myCards.add(attackingCard!!)
-            addCardImageToLayout(myCardsLayout, attackingCard!!.drawableID, attackingCard!!)
-
-            // Tühjenda laud
-            clearTableAfterTurn(attackerWon = true) // true = ründaja (AI) võitis
-
-            // Muuda olekut: Mängija ründab (kuna ta võttis kaardid)
-            currentTurn = GameTurn.PLAYER_ATTACK
+            drawCards(myCards)
+            drawCards(enemyCards)
+            currentTurn = nextTurn
             updateGameUI()
+            if (nextTurn == GameTurn.ENEMY_ATTACK || nextTurn == GameTurn.ENEMY_DEFEND) {
+                runEnemyLogic()
+            }
         }
     }
 
     private fun runEnemyLogic() {
 
         // --- AI KAITSE LOOGIKA ---
-        if (currentTurn == GameTurn.ENEMY_DEFEND) {
+        if (currentTurn == GameTurn.ENEMY_DEFEND) { //Its enemy's turn
 
-            // Leia kaart, millega rünnak (attackingCard) ära lüüa
-            val cardToBeat = attackingCard!!
+            val cardToBeat = attackingCard!! // Find card to beat players card
 
-            // **AI LOOGIKA ALGUS (VÄGA LIHTNE NÄIDE):**
-            // 1. Leia kõik kaardid AI käes, mis sobivad kaitseks
+            // 1. Find cards if the enemy can defend it.
             val validDefendingCards = enemyCards.filter { cardInHand ->
                 kasKaartLobA(cardInHand, cardToBeat) // Kasutame sama reeglit!
             }
 
-            // 2. Vali neist nõrgim (et säästa tugevaid kaarte)
-            val chosenCard = validDefendingCards.minByOrNull { it.cardStrength }
+            val chosenCard = validDefendingCards.minByOrNull { it.cardStrength } //if can defend choose the weakest to keep the stronger
 
-            // 3. Tee otsus
-            if (chosenCard != null) {
-                // **AI SUUTIS KAITSTA**
+            if (chosenCard != null) { //Make a desision and update UI and cards in the layout and list
+
                 enemyCards.remove(chosenCard)
-                // Eemalda AI UI-st üks kaart (suvaline, sest näeme vaid tagakülgi)
                 (enemyCardsLayout.getChildAt(0) as? ImageView)?.let {
                     enemyCardsLayout.removeView(it)
                 }
 
                 defendingCard = chosenCard
-                kaitsekaartTextView.text = "Kaitse: ${chosenCard.cardSuit} ${chosenCard.cardName}"
+                kaitsekaartTextView.text = "Defence: ${chosenCard.cardSuit} ${chosenCard.cardName}"
+                Toast.makeText(this, "Enemy Defended", Toast.LENGTH_SHORT).show()
 
-                Toast.makeText(this, "Vastane kaitses!", Toast.LENGTH_SHORT).show()
-                clearTableAfterTurn(attackerWon = false) // false = kaitsja (AI) võitis
-
-                // Muuda olekut: AI ründab (sest tema kaitses edukalt)
-                currentTurn = GameTurn.ENEMY_ATTACK
-                updateGameUI()
-                runEnemyLogic() // Kutsu AI loogika uuesti, et ta ründaks
-
+                clearTableAfterTurnAndContinue(
+                    attackerWon = false,
+                    nextTurn = GameTurn.ENEMY_ATTACK,
+                    delayAfterClear = 2000L
+                )
+                return
             } else {
-                // **AI EI SUUTNUD KAITSTA (Võtab kaardi)**
-                Toast.makeText(this, "Vastane võttis kaardi!", Toast.LENGTH_SHORT).show()
-                enemyCards.add(cardToBeat)
+                // AI cannot defend and takes a new card.
+                val cardToBeat = attackingCard!! // takes the attacking card
+                Toast.makeText(this, "Enemy took a card", Toast.LENGTH_SHORT).show()
 
+                enemyCards.add(cardToBeat)
                 addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
 
-                clearTableAfterTurn(attackerWon = true) // true = ründaja (mängija) võitis
-
-                // Muuda olekut: Mängija ründab uuesti
-                currentTurn = GameTurn.PLAYER_ATTACK
-                updateGameUI()
+                clearTableAfterTurnAndContinue(
+                    attackerWon = true,
+                    nextTurn = GameTurn.PLAYER_ATTACK,
+                    delayAfterClear = 1000L // 1 sek viivitus
+                )
+                return // End the enemy's round
             }
-        }
+        } else if (currentTurn == GameTurn.ENEMY_ATTACK) {
+            val cardToAttackWith = enemyCards
+                .filter { it.cardSuit != trumpSuit } // checks for the trump suit
+                .minByOrNull { it.cardStrength } ?: enemyCards.minByOrNull { it.cardStrength } // or the weakest trump card
 
-        // --- AI RÜNDE LOOGIKA ---
-        else if (currentTurn == GameTurn.ENEMY_ATTACK) {
-
-            // **AI LOOGIKA ALGUS (VÄGA LIHTNE NÄIDE):**
-            // 1. Vali ründamiseks nõrgim kaart (mis pole trump)
-            val attackCard = enemyCards.filter { it.cardSuit != trumpSuit }.minByOrNull { it.cardStrength }
-                ?: enemyCards.minByOrNull { it.cardStrength } // Või suvaline nõrgim, kui trumbid on
-
-            if (attackCard != null) {
-                // AI ründab
-                enemyCards.remove(attackCard)
+            if (cardToAttackWith != null) {
+                enemyCards.remove(cardToAttackWith) //remove the card from the enemy's deck list
+                //Update the enemy cards UI layout
                 (enemyCardsLayout.getChildAt(0) as? ImageView)?.let {
                     enemyCardsLayout.removeView(it)
                 }
 
-                attackingCard = attackCard
-                cardPlacement.setImageResource(attackCard.drawableID)
-                rundekaartTextView.text = "Rünne: ${attackCard.cardSuit} ${attackCard.cardName}"
-                kaitsekaartTextView.text = "Kaitse: ..."
+                // 3. Pane kaart lauale ründeks
+                attackingCard = cardToAttackWith
+                cardPlacement.setImageResource(cardToAttackWith.drawableID)
+                rundekaartTextView.text = "Attacking: ${cardToAttackWith.cardSuit} ${cardToAttackWith.cardName}"
+                kaitsekaartTextView.text = "Defence: ..."
 
-                // Muuda olekut: Mängija peab kaitsma
-                currentTurn = GameTurn.PLAYER_DEFEND
+                currentTurn = GameTurn.PLAYER_DEFEND //our time to defend
                 updateGameUI()
 
+                Toast.makeText(this, "Enemy attacked with: ${cardToAttackWith.cardName}", Toast.LENGTH_SHORT).show()
             } else {
-                // AI-l pole kaarte, mäng läbi?
-                Toast.makeText(this, "Vastasel said kaardid otsa!", Toast.LENGTH_LONG).show()
+                currentTurn = GameTurn.PLAYER_ATTACK //if enemy cannot attack then take a new card
+                updateGameUI()
             }
         }
     }
 
-    /**
-     * Kontrollib, kas kaitsev kaart lööb ründava kaardi.
-     * PEAD SELLE ISE TÄIENDAMA VASTAVALT OMA REEGLITELE!
-     */
+    private fun drawCards(cardsList: MutableList<Card>) {
+
+        val targetSize = 5 //checks the size
+
+        while (cardsList.size < targetSize && drawableDeck.isNotEmpty()) {
+            val newCard = drawableDeck.removeAt(0)
+            cardsList.add(newCard) //add new cards
+
+            if (cardsList == enemyCards) {
+                addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
+            }
+        }
+        cardsLeftTextView.text = "${drawableDeck.size}" //Update the card deck
+    }
     private fun kasKaartLobA(defendingCard: Card, cardToBeat: Card): Boolean {
-        // Reegel 1: Ründav kaart on trump
-        if (cardToBeat.cardSuit == trumpSuit) {
-            // Ainult tugevam trump lööb
-            return (defendingCard.cardSuit == trumpSuit && defendingCard.cardStrength > cardToBeat.cardStrength)
-        }
-
-        // Reegel 2: Ründav kaart EI ole trump
-        else {
-            // Variant A: Sama mast, tugevam kaart
-            if (defendingCard.cardSuit == cardToBeat.cardSuit && defendingCard.cardStrength > cardToBeat.cardStrength) {
+        if (defendingCard.cardSuit == trumpSuit) {
+            if (cardToBeat.cardSuit != trumpSuit) {
                 return true
             }
-            // Variant B: Kaitsev kaart on trump
-            if (defendingCard.cardSuit == trumpSuit) {
-                return true
+            else { // cardToBeat.cardSuit == trumpSuit
+                return defendingCard.cardStrength > cardToBeat.cardStrength //Checks if the card kill a stronger trump
             }
+        } else { // defendingCard.cardSuit != trumpSuit basically if the trump card cannot kill a stronger trump card
+            if (cardToBeat.cardSuit == trumpSuit) {
+                return false
+            }
+
+            if (defendingCard.cardSuit == cardToBeat.cardSuit) { //Checks the suit
+                return defendingCard.cardStrength > cardToBeat.cardStrength
+            }
+            return false //if its not trump suit then you cannot kill or do nothing
         }
-
-        // Muul juhul kaart ei sobi
-        return false
-    }
-
-    /**
-     * Tühjendab laua pärast käigu lõppu.
-     */
-    private fun clearTableAfterTurn(attackerWon: Boolean) {
-        // TODO: Võiksid lisada siia viivituse (delay), et mängija näeks kaarte
-
-        cardPlacement.setImageResource(0) // 0 = tühi pilt
-        rundekaartTextView.text = "Rünne:"
-        kaitsekaartTextView.text = "Kaitse:"
-
-        // Kes saab kaardid? (Hetkel me ei tee "hunnikut", seega kaardid lihtsalt kaovad)
-
-        attackingCard = null
-        defendingCard = null
     }
 }
