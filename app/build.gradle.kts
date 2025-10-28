@@ -59,6 +59,17 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
+    // QR code API
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.11.0")
+    implementation("io.coil-kt:coil:2.6.0")
+
+    // QR Reading
+    implementation("androidx.camera:camera-core:1.3.4")
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -78,6 +89,8 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+
 
 
 }
