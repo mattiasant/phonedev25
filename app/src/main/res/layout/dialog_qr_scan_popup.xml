@@ -15,6 +15,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <TextView
+        android:id="@+id/scanInfo"
+        android:text="Point your camera at a QR code"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <androidx.camera.view.PreviewView
         android:id="@+id/cameraPreview"
         android:layout_width="300dp"
