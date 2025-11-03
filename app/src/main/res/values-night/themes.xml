@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Light Theme -->
-    <style name="Theme.Phonedev25" parent="Theme.Material3.Light.NoActionBar">
-        <!-- Primary colors - Vintage Brown -->
-        <item name="colorPrimary">@color/vintage_brown</item>
-        <item name="colorPrimaryVariant">@color/vintage_dark</item>
-        <item name="colorOnPrimary">@color/vintage_cream</item>
+    <style name="Theme.Phonedev25" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Primary colors -->
+        <item name="colorPrimary">@color/vintage_brown_light</item>
+        <item name="colorPrimaryVariant">@color/vintage_brown</item>
+        <item name="colorOnPrimary">@color/text_primary_dark</item>
 
-        <!-- Secondary colors - Card Red -->
-        <item name="colorSecondary">@color/vintage_red</item>
-        <item name="colorSecondaryVariant">@color/vintage_red_dark</item>
-        <item name="colorOnSecondary">@color/vintage_cream</item>
+        <!-- Secondary colors -->
+        <item name="colorSecondary">@color/vintage_red_light</item>
+        <item name="colorSecondaryVariant">@color/vintage_red</item>
+        <item name="colorOnSecondary">@color/text_primary_dark</item>
 
         <!-- Background colors -->
-        <item name="android:colorBackground">@color/background_light</item>
-        <item name="colorSurface">@color/surface_light</item>
-        <item name="colorOnBackground">@color/text_primary_light</item>
-        <item name="colorOnSurface">@color/text_primary_light</item>
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="colorSurface">@color/surface_dark</item>
+        <item name="colorOnBackground">@color/text_primary_dark</item>
+        <item name="colorOnSurface">@color/text_primary_dark</item>
 
         <!-- Status bar -->
-        <item name="android:statusBarColor">@color/vintage_brown</item>
+        <item name="android:statusBarColor">@color/background_dark</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
-
+    
     <!-- Splash Screen Theme -->
     <style name="Theme.FivePapers.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/vintage_brown</item>

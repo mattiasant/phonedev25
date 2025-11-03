@@ -85,6 +85,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintWidth_percent="0.85" />
+        
+        <!-- Switch 4 -->
+        <Switch
+            android:id="@+id/themeSwitch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Dark Mode"
+            android:textSize="20sp"
+            app:layout_constraintTop_toBottomOf="@id/switch3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintWidth_percent="0.85" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
