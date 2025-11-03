@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Light Theme -->
-    <style name="Theme.Phonedev25.dark" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.Phonedev25" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary colors - Vintage Brown -->
         <item name="colorPrimary">@color/vintage_brown</item>
         <item name="colorPrimaryVariant">@color/vintage_dark</item>
@@ -45,7 +45,7 @@
         <item name="contentPadding">16dp</item>
     </style>
 
-    <style name="Theme.Phonedev25" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.Phonedev25.dark" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Primary colors -->
         <item name="colorPrimary">@color/vintage_brown_light</item>
         <item name="colorPrimaryVariant">@color/vintage_brown</item>

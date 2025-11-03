@@ -88,7 +88,7 @@
         android:layout_marginTop="31dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/arrowback" />
+        app:srcCompat="@drawable/arrowback2" />
 
     <ImageView
         android:id="@+id/imageView4"
@@ -98,7 +98,7 @@
         android:layout_marginEnd="84dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/settingsbutton" />
+        app:srcCompat="@drawable/settingsbutton2" />
 
     <ImageView
         android:id="@+id/imageView5"
@@ -108,7 +108,7 @@
         android:layout_marginBottom="15dp"
         app:layout_constraintBottom_toTopOf="@+id/makeCode_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/makeqr" />
+        app:srcCompat="@drawable/makeqr2" />
 
     <ImageView
         android:id="@+id/imageView6"
@@ -118,6 +118,6 @@
         android:layout_marginBottom="15dp"
         app:layout_constraintBottom_toTopOf="@+id/ScanCode_text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/camera" />
+        app:srcCompat="@drawable/camera2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
