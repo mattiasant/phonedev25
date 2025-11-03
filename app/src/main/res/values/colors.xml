@@ -7,4 +7,32 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="vintage_brown">#8B4513</color>
+    <color name="vintage_dark">#654321</color>
+    <color name="vintage_cream">#E8D4B0</color>
+    <color name="vintage_red">#8B0000</color>
+    <color name="vintage_red_dark">#660000</color>
+
+    <!-- Light Theme Colors -->
+    <color name="background_light">#FFF8F0</color>
+    <color name="surface_light">#FFFFFF</color>
+    <color name="text_primary_light">#3E2723</color>
+    <color name="text_secondary_light">#6D4C41</color>
+
+    <!-- Card Colors -->
+    <color name="card_background_light">#FFFBF5</color>
+    <color name="card_border_light">#D7CCC8</color>
+
+    <!-- Dark Theme Colors -->
+    <color name="vintage_brown_light">#A0826D</color>
+    <color name="vintage_red_light">#C62828</color>
+
+    <color name="background_dark">#1C1410</color>
+    <color name="surface_dark">#2C2118</color>
+    <color name="text_primary_dark">#E8D4B0</color>
+    <color name="text_secondary_dark">#BCAAA4</color>
+
+    <color name="card_background_dark">#3C2F20</color>
+    <color name="card_border_dark">#5D4037</color>
+
 </resources>
