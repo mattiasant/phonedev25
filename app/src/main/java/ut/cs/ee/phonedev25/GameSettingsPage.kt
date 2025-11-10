@@ -39,8 +39,7 @@ class GameSettingsPage : AppCompatActivity() {
         }
 
         // Back buttons
-        findViewById<ImageView>(R.id.imageView7).setOnClickListener { finish() }
-        findViewById<TextView>(R.id.back_text4).setOnClickListener { finish() }
+        findViewById<ImageView>(R.id.imageView4).setOnClickListener { finish() }
 
         // Theme switch
         val themeSwitch = findViewById<Switch>(R.id.themeSwitch)

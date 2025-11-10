@@ -57,10 +57,6 @@ class Join_Game : AppCompatActivity() {
             finish()
         }
 
-        findViewById<TextView>(R.id.back_text).setOnClickListener {
-            finish()
-        }
-
         findViewById<Button>(R.id.startGame).setOnClickListener {
             startActivity(Intent(this, gameArena::class.java))
         }

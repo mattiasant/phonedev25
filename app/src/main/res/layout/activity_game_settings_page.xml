@@ -15,49 +15,47 @@
         android:padding="24dp">
 
         <!-- Back Arrow -->
-        <ImageView
-            android:id="@+id/imageView7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/arrowback"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Back Text -->
-        <TextView
-            android:id="@+id/back_text4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="36dp"
-            android:text="Back"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imageView7" />
 
         <!-- Title -->
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/arrowback2" />
+
         <TextView
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="127dp"
             android:text="Game Settings"
             android:textAlignment="center"
             android:textSize="36sp"
-            app:layout_constraintTop_toBottomOf="@id/back_text4"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView4" />
 
         <!-- Switch 1 -->
         <Switch
             android:id="@+id/switch1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="344dp"
+            android:layout_marginBottom="20dp"
+            android:minHeight="48dp"
             android:text="Enable card backs"
             android:textSize="20sp"
-            app:layout_constraintTop_toBottomOf="@id/textView4"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/switch2"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.85" />
 
         <!-- Switch 2 -->
@@ -66,11 +64,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:minHeight="48dp"
             android:text="Enable animations"
             android:textSize="20sp"
-            app:layout_constraintTop_toBottomOf="@id/switch1"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/switch1"
             app:layout_constraintWidth_percent="0.85" />
 
         <!-- Switch 3 -->
@@ -79,24 +78,26 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:minHeight="48dp"
             android:text="Enable power-ups"
             android:textSize="20sp"
-            app:layout_constraintTop_toBottomOf="@id/switch2"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/switch2"
             app:layout_constraintWidth_percent="0.85" />
-        
+
         <!-- Switch 4 -->
         <Switch
             android:id="@+id/themeSwitch"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:minHeight="48dp"
             android:text="Dark Mode"
             android:textSize="20sp"
-            app:layout_constraintTop_toBottomOf="@id/switch3"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/switch3"
             app:layout_constraintWidth_percent="0.85" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

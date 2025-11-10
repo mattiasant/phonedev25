@@ -19,12 +19,9 @@ class StorePage : AppCompatActivity() {
             insets
         }
 
-        findViewById<ImageView>(R.id.imageView2).setOnClickListener {
+        findViewById<ImageView>(R.id.imageView19).setOnClickListener {
             finish()
         }
 
-        findViewById<TextView>(R.id.back_text2).setOnClickListener {
-            finish()
-        }
     }
 }

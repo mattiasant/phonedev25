@@ -1,7 +1,6 @@
 package ut.cs.ee.phonedev25
 
 import android.os.Bundle
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -23,10 +22,7 @@ class StatisticsPage : AppCompatActivity() {
         findViewById<ImageView>(R.id.imageView).setOnClickListener {
             finish()
         }
-
-        findViewById<TextView>(R.id.back_text3).setOnClickListener {
-            finish()
-        }
+        
     }
 
 }
