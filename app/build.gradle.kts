@@ -50,6 +50,10 @@ dependencies {
     // Room (example)
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    testImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.androidx.junit)
+    testImplementation(libs.androidx.rules)
+    testImplementation(libs.androidx.espresso.intents)
     kapt("androidx.room:room-compiler:2.6.1")
 
     // Material
@@ -109,6 +113,6 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test:rules:1.5.0")
-
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
 
 }
