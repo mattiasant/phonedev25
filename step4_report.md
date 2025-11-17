@@ -27,5 +27,5 @@
 - Output APK
 - Signature validation confirmed
 
-##Known Bugs or Limitations
+## Known Bugs or Limitations
 - Occasional UI overlap
