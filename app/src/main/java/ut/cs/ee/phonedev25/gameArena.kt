@@ -14,6 +14,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import ut.cs.ee.phonedev25.data.StatsManager
+
 
 class gameArena : AppCompatActivity() {
 
@@ -237,6 +239,8 @@ class gameArena : AppCompatActivity() {
             // Give it to the player
             myCards.add(newCard)
             addCardImageToLayout(myCardsLayout, newCard.drawableID, newCard)
+            StatsManager.addCardPickedUp(this)
+
 
             // Update card deck number.
             cardsLeftTextView.text = "${drawableDeck.size}"
@@ -261,6 +265,8 @@ class gameArena : AppCompatActivity() {
                 myCards.add(cardToTake)
                 // add it to our cards
                 addCardImageToLayout(myCardsLayout, cardToTake.drawableID, cardToTake)
+                StatsManager.addCardPickedUp(this)
+
 
                 Toast.makeText(this, "You took the trump card: ${cardToTake.cardSuit} ${cardToTake.cardName}", Toast.LENGTH_SHORT).show()
 
@@ -291,6 +297,7 @@ class gameArena : AppCompatActivity() {
                 myCardsLayout.removeView(selectedImageView) //removes the card from layout
                 myCards.remove(selectedCard) //removes it from the list
                 selectedImageView = null //deltes the image
+                StatsManager.addCardPlaced(this) //stat card placed +1
 
                 attackingCard = selectedCard //put it to the table and show it
                 cardPlacement.setImageResource(selectedCard.drawableID)
@@ -522,6 +529,7 @@ class gameArena : AppCompatActivity() {
 
             myCards.add(cardToTake) // Lisa kaart mängija andmetesse
             addCardImageToLayout(myCardsLayout, cardToTake.drawableID, cardToTake) // Lisa kaart mängija UI-sse
+            StatsManager.addCardPickedUp(this)
 
             // (Märkus: Sinu praegune loogika ei toeta mitme kaardi laual olemist,
             // seega võtame ainult 'attackingCard'. Kui 'defendingCard' oleks olemas,
