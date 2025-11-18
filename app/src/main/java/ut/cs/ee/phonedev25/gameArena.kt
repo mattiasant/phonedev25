@@ -562,7 +562,7 @@ class gameArena : AppCompatActivity() {
 
     private fun checkForWinOrLoss() {
         // Win con: enemy has no cards left
-        if (enemyCards.isEmpty()) {
+        if (enemyCards.isEmpty() && drawableDeck.isEmpty()) {
             StatsManager.addWin(this)
             Toast.makeText(this, "You win!", Toast.LENGTH_LONG).show()
             finish()
@@ -570,7 +570,7 @@ class gameArena : AppCompatActivity() {
         }
 
         // Loss condition: player have no cards left
-        if (myCards.isEmpty()) {
+        if (myCards.isEmpty() && drawableDeck.isEmpty()) {
             StatsManager.addLoss(this)
             Toast.makeText(this, "You lose!", Toast.LENGTH_LONG).show()
             finish()
