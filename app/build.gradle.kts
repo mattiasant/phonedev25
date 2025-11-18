@@ -52,8 +52,9 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     testImplementation(libs.androidx.espresso.core)
     testImplementation(libs.androidx.junit)
-    testImplementation(libs.androidx.rules)
-    testImplementation(libs.androidx.espresso.intents)
+    //Need kaks siin all lõhuvad Mirko Android Studio/Gradle ära
+    //testImplementation(libs.androidx.rules)
+    //testImplementation(libs.androidx.espresso.intents)
     kapt("androidx.room:room-compiler:2.6.1")
 
     // Material

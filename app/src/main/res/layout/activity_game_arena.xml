@@ -82,7 +82,7 @@
         android:id="@+id/card_placement"
         android:layout_width="100dp"
         android:layout_height="170dp"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="100dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enemyCardsLayout"
@@ -92,9 +92,9 @@
         android:id="@+id/rundekaart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="10dp"
-        android:text="TextView"
+        android:text="Attacking: Waiting for first card"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/card_placement" />
 
@@ -102,9 +102,9 @@
         android:id="@+id/kaitsekaart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="4dp"
-        android:text="TextView"
+        android:text="Defending:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rundekaart" />
 

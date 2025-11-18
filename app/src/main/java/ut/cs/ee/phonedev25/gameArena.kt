@@ -124,7 +124,7 @@ class gameArena : AppCompatActivity() {
             revealedTrumpCard = drawnTrumpCard // <--- LISA SEE RIDA
 
             trumpCardImage.setImageResource(drawnTrumpCard.drawableID)
-            Toast.makeText(this, "Trumbimast on: $trumpSuit", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "The trump is: $trumpSuit", Toast.LENGTH_LONG).show()
         }
 
         //------------------------------GAME LISTENER------------------------------------
@@ -140,19 +140,19 @@ class gameArena : AppCompatActivity() {
     private fun updateGameUI() {
         when (currentTurn) {
             GameTurn.PLAYER_ATTACK -> {
-                gameInfoTextView.text = "Sinu kord rünnata!"
+                gameInfoTextView.text = "Your time to attack!"
                 placeButton.isEnabled = true
             }
             GameTurn.ENEMY_DEFEND -> {
-                gameInfoTextView.text = "Vastane kaitseb..."
+                gameInfoTextView.text = "Enemy is defending"
                 placeButton.isEnabled = false // Keela nupud, kuni AI mõtleb
             }
             GameTurn.ENEMY_ATTACK -> {
-                gameInfoTextView.text = "Vastane ründab!"
+                gameInfoTextView.text = "Enemy attacked"
                 placeButton.isEnabled = false // AI ründab, sina ei saa "Place" panna
             }
             GameTurn.PLAYER_DEFEND -> {
-                gameInfoTextView.text = "Sinu kord kaitsta!"
+                gameInfoTextView.text = "Your turn to defend"
                 placeButton.isEnabled = true // "Place" nupp on nüüd kaitseks
             }
         }
@@ -238,7 +238,7 @@ class gameArena : AppCompatActivity() {
             // Update card deck number.
             cardsLeftTextView.text = "${drawableDeck.size}"
 
-            Toast.makeText(this, "Võtsid kaardi: ${newCard.cardSuit} ${newCard.cardName}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "You took a card: ${newCard.cardSuit} ${newCard.cardName}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -246,7 +246,7 @@ class gameArena : AppCompatActivity() {
         trumpCardImage.setOnClickListener {
             // Check if there exists a trump card.
             if (revealedTrumpCard == null) {
-                Toast.makeText(this, "Trumbikaart on juba võetud!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "The trump card has been taken", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -259,7 +259,7 @@ class gameArena : AppCompatActivity() {
                 // add it to our cards
                 addCardImageToLayout(myCardsLayout, cardToTake.drawableID, cardToTake)
 
-                Toast.makeText(this, "Võtsid trumbikaardi: ${cardToTake.cardSuit} ${cardToTake.cardName}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "You took the trump card: ${cardToTake.cardSuit} ${cardToTake.cardName}", Toast.LENGTH_SHORT).show()
 
                 revealedTrumpCard = null //empty the card thingy
                 trumpCardImage.setImageResource(0) // removes picture
@@ -304,14 +304,32 @@ class gameArena : AppCompatActivity() {
             else if (currentTurn == GameTurn.PLAYER_DEFEND) { //Its my turn
 
                 //You need to defend.
+
                 if (defendingCard != null) {
                     Toast.makeText(this, "You need to kill or attack again if there is no cards on the table", Toast.LENGTH_LONG).show()
+
+                    clearTableAfterTurnAndContinue(
+                        nextTurn = GameTurn.PLAYER_ATTACK,
+                        delayAfterClear = 0L, // Nüüd võib kohe koristada, sest sa vajutasid nuppu
+                        drawForPlayer = true,
+                        drawForEnemy = true
+                    )
+
+                    return@setOnClickListener
+                }
+
+                if (selectedImageView == null) {
+                    Toast.makeText(this, "Vali kaart enne lauale panemist!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
 
                 val selectedCard = selectedImageView?.tag as Card //Select the card imgae
 
-                // **Siia pead lisama reegli, kas sinu kaart lööb AI kaardi (attackingCard) ära!**
+                if (attackingCard == null) {
+                    Toast.makeText(this, "Pole kaarti, mida rünnata!", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
                 val canDefend = kasKaartLobA(selectedCard, attackingCard!!) // Pead ise looma selle funktsiooni!
 
                 if (canDefend) { //if the card can defend
@@ -322,19 +340,11 @@ class gameArena : AppCompatActivity() {
                     defendingCard = selectedCard
 
                     //Update text
-                    kaitsekaartTextView.text = "Defence: ${selectedCard.cardSuit} ${selectedCard.cardName}"
+                    kaitsekaartTextView.text = "Defending: ${selectedCard.cardSuit} ${selectedCard.cardName}"
                     cardPlacement.setImageResource(selectedCard.drawableID) // Kuva kaitsva kaardi pilt laua
+                    updateGameUI()
 
-                    Toast.makeText(this, "Defence sucsessful!", Toast.LENGTH_SHORT).show()
-
-                    //Wait and change turns
-                    clearTableAfterTurnAndContinue(
-                        nextTurn = GameTurn.PLAYER_ATTACK,
-                        delayAfterClear = 5000L,
-                        drawForPlayer = false, // Sina (kaitsja) tõmbad
-                        drawForEnemy = true   // AI (ründaja) tõmbab
-                    )
-
+                    Toast.makeText(this, "Defence successful!", Toast.LENGTH_SHORT).show()
                 } else {
                     // If the selected card cannot defend or kill the enemy's card.
                     Toast.makeText(this, "This card cannot defend, try another!", Toast.LENGTH_SHORT).show()
@@ -349,8 +359,8 @@ class gameArena : AppCompatActivity() {
             kotlinx.coroutines.delay(delayAfterClear)
 
             cardPlacement.setImageResource(0) //Delete the old text to replace with the new.
-            rundekaartTextView.text = "Rünne:"
-            kaitsekaartTextView.text = "Kaitse:"
+            rundekaartTextView.text = "Attacking:"
+            kaitsekaartTextView.text = "Defending:"
             attackingCard = null
             defendingCard = null
 
@@ -391,14 +401,17 @@ class gameArena : AppCompatActivity() {
                 }
 
                 defendingCard = chosenCard
-                kaitsekaartTextView.text = "Defence: ${chosenCard.cardSuit} ${chosenCard.cardName}"
+                kaitsekaartTextView.text = "Defending: ${chosenCard.cardSuit} ${chosenCard.cardName}"
+                cardPlacement.setImageResource(chosenCard.drawableID)
+                updateGameUI()
+
                 Toast.makeText(this, "Enemy Defended", Toast.LENGTH_SHORT).show()
 
                 clearTableAfterTurnAndContinue(
                     nextTurn = GameTurn.ENEMY_ATTACK,
                     delayAfterClear = 2000L,
-                    drawForPlayer = true, // Sina (ründaja) tõmbad
-                    drawForEnemy = true   // AI (kaitsja) tõmbab
+                    drawForPlayer = true,
+                    drawForEnemy = true
                 )
                 return
             } else {
@@ -411,9 +424,9 @@ class gameArena : AppCompatActivity() {
 
                 clearTableAfterTurnAndContinue(
                     nextTurn = GameTurn.PLAYER_ATTACK,
-                    delayAfterClear = 1000L,
-                    drawForPlayer = true, // Sina (ründaja) tõmbad
-                    drawForEnemy = false  // AI (kes korjas) EI TÕMBA
+                    delayAfterClear = 2000L,
+                    drawForPlayer = false,
+                    drawForEnemy = true
                 )
                 return // End the enemy's round
             }
@@ -433,7 +446,7 @@ class gameArena : AppCompatActivity() {
                 attackingCard = cardToAttackWith
                 cardPlacement.setImageResource(cardToAttackWith.drawableID)
                 rundekaartTextView.text = "Attacking: ${cardToAttackWith.cardSuit} ${cardToAttackWith.cardName}"
-                kaitsekaartTextView.text = "Defence: ..."
+                kaitsekaartTextView.text = "Defending: ..."
 
                 currentTurn = GameTurn.PLAYER_DEFEND //our time to defend
                 updateGameUI()
@@ -511,7 +524,7 @@ class gameArena : AppCompatActivity() {
             // seega võtame ainult 'attackingCard'. Kui 'defendingCard' oleks olemas,
             // tähendaks see, et kaitse oli edukas, aga me oleme siin ebaõnnestumise haru.)
 
-            Toast.makeText(this, "Võtsid kaardi. Vastane ründab uuesti.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "You took a card, its now enemy's turn to attack.", Toast.LENGTH_LONG).show()
 
             // 4. Kasuta olemasolevat laua tühjendamise loogikat
             // See on sarnane AI ebaõnnestunud kaitsele, aga vastupidi.
@@ -519,7 +532,7 @@ class gameArena : AppCompatActivity() {
             // Järgmine kord on JÄLLE vastase rünnak.
             clearTableAfterTurnAndContinue(
                 nextTurn = GameTurn.ENEMY_ATTACK,
-                delayAfterClear = 5000L,
+                delayAfterClear = 2000L,
                 drawForPlayer = false, // Sina (kes korjas) EI TÕMBA
                 drawForEnemy = true    // AI (ründaja) tõmbab
             )
