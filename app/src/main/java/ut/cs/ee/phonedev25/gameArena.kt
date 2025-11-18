@@ -319,15 +319,56 @@ class gameArena : AppCompatActivity() {
                 //You need to defend.
 
                 if (defendingCard != null) {
-                    Toast.makeText(this, "You need to kill or attack again if there is no cards on the table", Toast.LENGTH_LONG).show()
 
-                    clearTableAfterTurnAndContinue(
-                        nextTurn = GameTurn.PLAYER_ATTACK,
-                        delayAfterClear = 0L, // Nüüd võib kohe koristada, sest sa vajutasid nuppu
-                        drawForPlayer = true,
-                        drawForEnemy = true
-                    )
+                    // KONTROLL: Kas sa oled juba uue kaardi valinud (et kohe rünnata)?
+                    if (selectedImageView != null) {
+                        // --- JAH, TAHAD KOHE RÜNNATA (ÜKS VAJUTUS) ---
 
+                        // 1. Korista vana laud (Manuaalselt, ilma viivituseta)
+                        cardPlacement.setImageResource(0)
+                        attackingCard = null
+                        defendingCard = null
+
+                        // 2. Jaga kaardid kätte (sest eelmine voor on läbi)
+                        drawCards(myCards)
+                        drawCards(enemyCards)
+
+                        // 3. Tee RÜNNAK uue kaardiga (Kopeeritud attack loogikast)
+                        val selectedCard = selectedImageView?.tag as Card
+
+                        // Eemalda kaart käest
+                        myCardsLayout.removeView(selectedImageView)
+                        myCards.remove(selectedCard)
+                        checkForWinOrLoss()
+                        selectedImageView = null
+                        StatsManager.addCardPlaced(this)
+
+                        // Pane kaart lauale
+                        attackingCard = selectedCard
+                        cardPlacement.setImageResource(selectedCard.drawableID)
+                        rundekaartTextView.text = "Attacking: ${selectedCard.cardSuit} ${selectedCard.cardName}"
+                        kaitsekaartTextView.text = "Defending: ..."
+
+                        // Muuda korda
+                        currentTurn = GameTurn.ENEMY_DEFEND
+                        updateGameUI()
+
+                        Toast.makeText(this, "Laud puhas ja uus rünnak alustatud!", Toast.LENGTH_SHORT).show()
+
+                        // Käivita vastase loogika
+                        runEnemyLogic()
+
+                    } else {
+                        // --- EI, TAHAD LIHTSALT LAUDA KORISTADA (TAVALINE) ---
+                        Toast.makeText(this, "Laud koristatud! Vali kaart rünnakuks.", Toast.LENGTH_SHORT).show()
+
+                        clearTableAfterTurnAndContinue(
+                            nextTurn = GameTurn.PLAYER_ATTACK,
+                            delayAfterClear = 0L,
+                            drawForPlayer = true,
+                            drawForEnemy = true
+                        )
+                    }
                     return@setOnClickListener
                 }
 
@@ -441,8 +482,8 @@ class gameArena : AppCompatActivity() {
                 clearTableAfterTurnAndContinue(
                     nextTurn = GameTurn.PLAYER_ATTACK,
                     delayAfterClear = 2000L,
-                    drawForPlayer = false,
-                    drawForEnemy = true
+                    drawForPlayer = true,
+                    drawForEnemy = false
                 )
                 return // End the enemy's round
             }
@@ -485,13 +526,19 @@ class gameArena : AppCompatActivity() {
         while (cardsList.size < targetSize && drawableDeck.isNotEmpty()) {
             val newCard = drawableDeck.removeAt(0)
             cardsList.add(newCard)
+        }
 
-            // ----- PARANDUS ALGAB SIIT -----
-            if (cardsList == myCards) {
-                // Lisa uus kaart MÄNGIJA layouti
-                addCardImageToLayout(myCardsLayout, newCard.drawableID, newCard)
-            } else if (cardsList == enemyCards) {
-                // Lisa kaarditagus VASTASE layouti
+        // 2. UUENDA UI, tagades täieliku sünkroonsuse kaartide arvu vahel
+        if (cardsList == myCards) {
+            // Mängija: Puhastame ja joonistame kõik kaardid uuesti (vajalik kaardivaliku funktsionaalsuse säilitamiseks).
+            myCardsLayout.removeAllViews()
+            for (card in myCards) {
+                addCardImageToLayout(myCardsLayout, card.drawableID, card)
+            }
+        } else if (cardsList == enemyCards) {
+            // Vastane: Puhastame ja joonistame uuesti tagurpidi kaardid.
+            enemyCardsLayout.removeAllViews()
+            for (i in 0 until enemyCards.size) {
                 addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
             }
         }
