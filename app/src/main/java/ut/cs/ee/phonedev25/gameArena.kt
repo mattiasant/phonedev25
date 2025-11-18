@@ -238,6 +238,7 @@ class gameArena : AppCompatActivity() {
 
             // Give it to the player
             myCards.add(newCard)
+            checkForWinOrLoss()
             addCardImageToLayout(myCardsLayout, newCard.drawableID, newCard)
             StatsManager.addCardPickedUp(this)
 
@@ -263,6 +264,7 @@ class gameArena : AppCompatActivity() {
                 val cardToTake = revealedTrumpCard!! // !! sest me kontrollisime null'i esimeses if-is
 
                 myCards.add(cardToTake)
+                checkForWinOrLoss()
                 // add it to our cards
                 addCardImageToLayout(myCardsLayout, cardToTake.drawableID, cardToTake)
                 StatsManager.addCardPickedUp(this)
@@ -296,6 +298,7 @@ class gameArena : AppCompatActivity() {
                 val selectedCard = selectedImageView?.tag as Card //use the selected card
                 myCardsLayout.removeView(selectedImageView) //removes the card from layout
                 myCards.remove(selectedCard) //removes it from the list
+                checkForWinOrLoss()
                 selectedImageView = null //deltes the image
                 StatsManager.addCardPlaced(this) //stat card placed +1
 
@@ -345,6 +348,7 @@ class gameArena : AppCompatActivity() {
                 if (canDefend) { //if the card can defend
                     myCardsLayout.removeView(selectedImageView)
                     myCards.remove(selectedCard)
+                    checkForWinOrLoss()
                     selectedImageView = null
 
                     defendingCard = selectedCard
@@ -406,6 +410,7 @@ class gameArena : AppCompatActivity() {
             if (chosenCard != null) { //Make a desision and update UI and cards in the layout and list
 
                 enemyCards.remove(chosenCard)
+                checkForWinOrLoss()
                 (enemyCardsLayout.getChildAt(0) as? ImageView)?.let {
                     enemyCardsLayout.removeView(it)
                 }
@@ -430,6 +435,7 @@ class gameArena : AppCompatActivity() {
                 Toast.makeText(this, "Enemy took a card", Toast.LENGTH_SHORT).show()
 
                 enemyCards.add(cardToBeat)
+                checkForWinOrLoss()
                 addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
 
                 clearTableAfterTurnAndContinue(
@@ -447,6 +453,7 @@ class gameArena : AppCompatActivity() {
 
             if (cardToAttackWith != null) {
                 enemyCards.remove(cardToAttackWith) //remove the card from the enemy's deck list
+                checkForWinOrLoss()
                 //Update the enemy cards UI layout
                 (enemyCardsLayout.getChildAt(0) as? ImageView)?.let {
                     enemyCardsLayout.removeView(it)
@@ -470,6 +477,8 @@ class gameArena : AppCompatActivity() {
     }
 
     private fun drawCards(cardsList: MutableList<Card>) {
+
+        checkForWinOrLoss()
 
         val targetSize = 5 //checks the size
 
@@ -528,6 +537,7 @@ class gameArena : AppCompatActivity() {
             val cardToTake = attackingCard!! // Teame, et see pole null
 
             myCards.add(cardToTake) // Lisa kaart mängija andmetesse
+            checkForWinOrLoss()
             addCardImageToLayout(myCardsLayout, cardToTake.drawableID, cardToTake) // Lisa kaart mängija UI-sse
             StatsManager.addCardPickedUp(this)
 
@@ -547,6 +557,24 @@ class gameArena : AppCompatActivity() {
                 drawForPlayer = false, // Sina (kes korjas) EI TÕMBA
                 drawForEnemy = true    // AI (ründaja) tõmbab
             )
+        }
+    }
+
+    private fun checkForWinOrLoss() {
+        // Win con: enemy has no cards left
+        if (enemyCards.isEmpty()) {
+            StatsManager.addWin(this)
+            Toast.makeText(this, "You win!", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
+        // Loss condition: player have no cards left
+        if (myCards.isEmpty()) {
+            StatsManager.addLoss(this)
+            Toast.makeText(this, "You lose!", Toast.LENGTH_LONG).show()
+            finish()
+            return
         }
     }
 }
