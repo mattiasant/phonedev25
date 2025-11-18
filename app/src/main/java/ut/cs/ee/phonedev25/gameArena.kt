@@ -189,11 +189,14 @@ class gameArena : AppCompatActivity() {
                 if (clickedView == selectedImageView) {
                     // If its been selected then it ignores
                     clickedView.translationY = 0f
+                    clickedView.elevation =0f
                     selectedImageView = null
                 } else {
                     //Otherwise bring back/keep down
                     selectedImageView?.translationY = 0f
+                    selectedImageView?.elevation = 0f
                     clickedView.translationY = moveUpDistancePx
+                    clickedView.elevation = 20f
                     selectedImageView = clickedView as ImageView
                 }
             }

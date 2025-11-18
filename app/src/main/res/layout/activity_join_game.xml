@@ -9,17 +9,17 @@
 
     <Button
         android:id="@+id/startGame"
-        android:layout_width="300dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
-        android:layout_marginEnd="55dp"
-        android:layout_marginBottom="88dp"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginBottom="68dp"
         android:background="@drawable/custom_button"
+
         android:text="Start Game"
         android:textSize="40dp"
         app:layout_constraintBottom_toTopOf="@+id/imageView5"
+
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -50,18 +50,14 @@
         android:id="@+id/joinGame_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="61dp"
-        android:layout_marginTop="246dp"
-        android:layout_marginEnd="61dp"
         android:text="Join Game"
         android:textSize="60sp"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:visibility="visible" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        android:layout_marginTop="246dp" />
 
     <ImageView
         android:id="@+id/imageView3"
