@@ -343,25 +343,17 @@ class gameArena : AppCompatActivity() {
                         selectedImageView = null
                         StatsManager.addCardPlaced(this)
 
-                        // Pane kaart lauale
                         attackingCard = selectedCard
                         cardPlacement.setImageResource(selectedCard.drawableID)
                         rundekaartTextView.text = "Attacking: ${selectedCard.cardSuit} ${selectedCard.cardName}"
                         kaitsekaartTextView.text = "Defending: ..."
 
-                        // Muuda korda
                         currentTurn = GameTurn.ENEMY_DEFEND
                         updateGameUI()
 
-                        Toast.makeText(this, "Laud puhas ja uus rünnak alustatud!", Toast.LENGTH_SHORT).show()
-
-                        // Käivita vastase loogika
                         runEnemyLogic()
 
                     } else {
-                        // --- EI, TAHAD LIHTSALT LAUDA KORISTADA (TAVALINE) ---
-                        Toast.makeText(this, "Laud koristatud! Vali kaart rünnakuks.", Toast.LENGTH_SHORT).show()
-
                         clearTableAfterTurnAndContinue(
                             nextTurn = GameTurn.PLAYER_ATTACK,
                             delayAfterClear = 0L,
@@ -399,6 +391,8 @@ class gameArena : AppCompatActivity() {
                     cardPlacement.setImageResource(selectedCard.drawableID) // Kuva kaitsva kaardi pilt laua
                     updateGameUI()
 
+                    gameInfoTextView.text = "Your time to attack!"
+
                     Toast.makeText(this, "Defence successful!", Toast.LENGTH_SHORT).show()
                 } else {
                     // If the selected card cannot defend or kill the enemy's card.
@@ -429,6 +423,7 @@ class gameArena : AppCompatActivity() {
             currentTurn = nextTurn
             updateGameUI()
             if (nextTurn == GameTurn.ENEMY_ATTACK || nextTurn == GameTurn.ENEMY_DEFEND) {
+                kotlinx.coroutines.delay(1000L)
                 runEnemyLogic()
             }
         }
@@ -528,21 +523,19 @@ class gameArena : AppCompatActivity() {
             cardsList.add(newCard)
         }
 
-        // 2. UUENDA UI, tagades täieliku sünkroonsuse kaartide arvu vahel
-        if (cardsList == myCards) {
-            // Mängija: Puhastame ja joonistame kõik kaardid uuesti (vajalik kaardivaliku funktsionaalsuse säilitamiseks).
+        cardsLeftTextView.text = "${drawableDeck.size}"
+
+        if (cardsList === myCards) {
             myCardsLayout.removeAllViews()
             for (card in myCards) {
                 addCardImageToLayout(myCardsLayout, card.drawableID, card)
             }
-        } else if (cardsList == enemyCards) {
-            // Vastane: Puhastame ja joonistame uuesti tagurpidi kaardid.
+        } else if (cardsList === enemyCards) {
             enemyCardsLayout.removeAllViews()
             for (i in 0 until enemyCards.size) {
                 addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
             }
         }
-        cardsLeftTextView.text = "${drawableDeck.size}"
     }
     private fun kasKaartLobA(defendingCard: Card, cardToBeat: Card): Boolean {
         if (defendingCard.cardSuit == trumpSuit) {
@@ -569,35 +562,24 @@ class gameArena : AppCompatActivity() {
 
             // 1. Kontrolli, kas on üldse mängija kaitse kord
             if (currentTurn != GameTurn.PLAYER_DEFEND) {
-                // Kui ei ole sinu kaitse kord, siis see klikk ei tee midagi
-                // (Võid lisada Tosti, nt: "Saad kaarte võtta vaid enda kaitse korra ajal")
                 return@setOnClickListener
             }
 
             // 2. Kontrolli, kas laual on kaart, mida võtta
-            // (See peaks alati tõsi olema PLAYER_DEFEND olukorras, aga on hea kontroll)
             if (attackingCard == null) {
                 return@setOnClickListener // Laual pole ründavat kaarti
             }
 
             // 3. Mängija võtab ründava kaardi endale
-            val cardToTake = attackingCard!! // Teame, et see pole null
+            val cardToTake = attackingCard!!
 
-            myCards.add(cardToTake) // Lisa kaart mängija andmetesse
+            myCards.add(cardToTake)
             checkForWinOrLoss()
-            addCardImageToLayout(myCardsLayout, cardToTake.drawableID, cardToTake) // Lisa kaart mängija UI-sse
+            addCardImageToLayout(myCardsLayout, cardToTake.drawableID, cardToTake)
             StatsManager.addCardPickedUp(this)
-
-            // (Märkus: Sinu praegune loogika ei toeta mitme kaardi laual olemist,
-            // seega võtame ainult 'attackingCard'. Kui 'defendingCard' oleks olemas,
-            // tähendaks see, et kaitse oli edukas, aga me oleme siin ebaõnnestumise haru.)
 
             Toast.makeText(this, "You took a card, its now enemy's turn to attack.", Toast.LENGTH_LONG).show()
 
-            // 4. Kasuta olemasolevat laua tühjendamise loogikat
-            // See on sarnane AI ebaõnnestunud kaitsele, aga vastupidi.
-            // Ründaja (AI) võitis, mängija kaotas korra.
-            // Järgmine kord on JÄLLE vastase rünnak.
             clearTableAfterTurnAndContinue(
                 nextTurn = GameTurn.ENEMY_ATTACK,
                 delayAfterClear = 2000L,
