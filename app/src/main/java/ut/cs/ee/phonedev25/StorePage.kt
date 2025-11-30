@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import android.content.Intent
+import android.widget.Button
 
 class StorePage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,9 +21,12 @@ class StorePage : AppCompatActivity() {
             insets
         }
 
-        findViewById<ImageView>(R.id.imageView19).setOnClickListener {
+        findViewById<ImageView>( R.id.imageView19).setOnClickListener {
             finish()
         }
 
+        findViewById<Button>(R.id.playNupp4).setOnClickListener {
+            startActivity(Intent(this, PowerUpsActivity::class.java))
+        }
     }
 }
