@@ -132,10 +132,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Start with advanced resources"
-            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:text="Create a random card of super type"
             android:textColor="#aaaaaa"
-            android:layout_marginTop="8dp" />
+            android:textSize="14sp" />
     </LinearLayout>
 
     <!-- Hyper-Thinker -->
@@ -177,10 +177,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enhanced thinking speed"
-            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:text="draw a card"
             android:textColor="#aaaaaa"
-            android:layout_marginTop="8dp" />
+            android:textSize="14sp" />
     </LinearLayout>
 
     <!-- Clueless Chaos -->
@@ -222,10 +222,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Random unpredictable effects"
-            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:text="enamy draws a card"
             android:textColor="#aaaaaa"
-            android:layout_marginTop="8dp" />
+            android:textSize="14sp" />
     </LinearLayout>
 
 </LinearLayout>
