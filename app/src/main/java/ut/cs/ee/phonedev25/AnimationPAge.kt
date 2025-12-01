@@ -6,30 +6,20 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.content.Intent
-import android.widget.Button
 
-class StorePage : AppCompatActivity() {
+class AnimationPAge : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_store_page)
+        setContentView(R.layout.activity_animation_page)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        findViewById<ImageView>( R.id.imageView19).setOnClickListener {
+        findViewById<ImageView>( R.id.imageView4).setOnClickListener {
             finish()
-        }
-
-        findViewById<Button>(R.id.playNupp4).setOnClickListener {
-            startActivity(Intent(this, PowerUpsActivity::class.java))
-        }
-
-        findViewById<Button>(R.id.playNupp3).setOnClickListener {
-            startActivity(Intent(this, AnimationPAge::class.java))
         }
     }
 }
