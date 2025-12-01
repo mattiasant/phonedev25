@@ -60,6 +60,29 @@ class PowerUpsActivity : AppCompatActivity() {
             togglePowerUp("Clueless Chaos", cluelessChaosStatus,
                 listOf(instantTriumphStatus, genesisForgeStatus, hyperThinkerStatus))
         }
+
+        // Load and display current active power-up
+        val currentPowerUp = PowerUpManager.getActivePowerUp(this)
+        activePowerUp = if (currentPowerUp == PowerUpManager.NONE) null else currentPowerUp
+
+        when (currentPowerUp) {
+            PowerUpManager.INSTANT_TRIUMPH -> {
+                instantTriumphStatus.text = "ON"
+                instantTriumphStatus.setTextColor(getColor(android.R.color.holo_green_dark))
+            }
+            PowerUpManager.GENESIS_FORGE -> {
+                genesisForgeStatus.text = "ON"
+                genesisForgeStatus.setTextColor(getColor(android.R.color.holo_green_dark))
+            }
+            PowerUpManager.HYPER_THINKER -> {
+                hyperThinkerStatus.text = "ON"
+                hyperThinkerStatus.setTextColor(getColor(android.R.color.holo_green_dark))
+            }
+            PowerUpManager.CLUELESS_CHAOS -> {
+                cluelessChaosStatus.text = "ON"
+                cluelessChaosStatus.setTextColor(getColor(android.R.color.holo_green_dark))
+            }
+        }
     }
 
     private fun togglePowerUp(powerUpName: String, statusView: TextView, otherStatusViews: List<TextView>) {
@@ -68,6 +91,7 @@ class PowerUpsActivity : AppCompatActivity() {
             activePowerUp = null
             statusView.text = "OFF"
             statusView.setTextColor(getColor(android.R.color.darker_gray))
+            PowerUpManager.setActivePowerUp(this, PowerUpManager.NONE)
         } else {
             // Turn off all other power-ups
             otherStatusViews.forEach {
@@ -78,6 +102,7 @@ class PowerUpsActivity : AppCompatActivity() {
             activePowerUp = powerUpName
             statusView.text = "ON"
             statusView.setTextColor(getColor(android.R.color.holo_green_dark))
+            PowerUpManager.setActivePowerUp(this, powerUpName)
         }
     }
 }

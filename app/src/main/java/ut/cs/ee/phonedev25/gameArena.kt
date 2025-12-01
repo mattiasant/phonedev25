@@ -15,9 +15,12 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ut.cs.ee.phonedev25.data.StatsManager
-
+import android.view.View
 
 class gameArena : AppCompatActivity() {
+
+    private var activePowerUp: String = PowerUpManager.NONE
+    private var powerUpUsed: Boolean = false
 
     private lateinit var enemyCards: MutableList<Card>
     private lateinit var myCards: MutableList<Card>
@@ -57,6 +60,9 @@ class gameArena : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        activePowerUp = PowerUpManager.getActivePowerUp(this)
+        PowerUpManager.resetPowerUpUsage(this)
+        powerUpUsed = false
         enableEdgeToEdge()
         setContentView(R.layout.activity_game_arena)
 
@@ -129,6 +135,9 @@ class gameArena : AppCompatActivity() {
             Toast.makeText(this, "The trump is: $trumpSuit", Toast.LENGTH_LONG).show()
         }
 
+        if (activePowerUp != PowerUpManager.NONE) {
+            Toast.makeText(this, "Power-up ready: $activePowerUp (click to activate)", Toast.LENGTH_LONG).show()
+        }
         //------------------------------GAME LISTENER------------------------------------
 
         // * MUUDATUS NR. 4: Kutsume välja uue kaardi võtmise funktsiooni
@@ -136,8 +145,31 @@ class gameArena : AppCompatActivity() {
         setupRandomCardListener(myCardsLayout)
         setupTrumpCardTakeListener(myCardsLayout)
         setupCardPlacementListener(myCardsLayout)
+        setupPowerUpButtonListener()
     }
 
+    // Add this new function to handle power-up button clicks:
+    private fun setupPowerUpButtonListener() {
+        // Assuming you have a button with id "powerUpButton" in your layout
+        val powerUpButton = findViewById<Button>(R.id.powersButton)
+
+        // Show/hide button based on power-up availability
+        if (activePowerUp == PowerUpManager.NONE || powerUpUsed) {
+            powerUpButton.visibility = View.GONE
+        } else {
+            powerUpButton.visibility = View.VISIBLE
+            powerUpButton.text = "Use Power Up"
+        }
+
+        powerUpButton.setOnClickListener {
+            if (!powerUpUsed && activePowerUp != PowerUpManager.NONE) {
+                applyPowerUpEffect()
+                powerUpButton.visibility = View.GONE
+            } else {
+                Toast.makeText(this, "Power-up already used!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
     //Game disables buttons when AI is thinking and doing its part.
     private fun updateGameUI() {
         when (currentTurn) {
@@ -604,6 +636,105 @@ class gameArena : AppCompatActivity() {
             Toast.makeText(this, "You lose!", Toast.LENGTH_LONG).show()
             finish()
             return
+        }
+    }
+
+    private fun applyPowerUpEffect() {
+        if (powerUpUsed || activePowerUp == PowerUpManager.NONE) {
+            return // Already used or no power-up active
+        }
+
+        when (activePowerUp) {
+            PowerUpManager.INSTANT_TRIUMPH -> {
+                // Win the game instantly
+                Toast.makeText(this, "Instant Triumph activated! You win!", Toast.LENGTH_LONG).show()
+                StatsManager.addWin(this)
+                PowerUpManager.markPowerUpUsed(this)
+                powerUpUsed = true
+                finish()
+            }
+
+            PowerUpManager.GENESIS_FORGE -> {
+                // Create a random trump card in hand
+                if (!powerUpUsed) {
+                    // Find trump cards in the deck
+                    val availableTrumps = drawableDeck.filter { it.cardSuit == trumpSuit }
+
+                    if (availableTrumps.isNotEmpty()) {
+                        // Take a random trump card
+                        val randomTrump = availableTrumps.random()
+                        drawableDeck.remove(randomTrump)
+
+                        // Add it to player's hand
+                        myCards.add(randomTrump)
+
+                        // Update UI
+                        myCardsLayout.removeAllViews()
+                        for (card in myCards) {
+                            addCardImageToLayout(myCardsLayout, card.drawableID, card)
+                        }
+
+                        cardsLeftTextView.text = "${drawableDeck.size}"
+
+                        Toast.makeText(this, "Genesis Forge: Created ${randomTrump.cardName} of $trumpSuit!", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this, "Genesis Forge: No trump cards available!", Toast.LENGTH_SHORT).show()
+                    }
+
+                    PowerUpManager.markPowerUpUsed(this)
+                    powerUpUsed = true
+                }
+            }
+
+            PowerUpManager.HYPER_THINKER -> {
+                // Player draws a card
+                if (!powerUpUsed) {
+                    if (drawableDeck.isNotEmpty()) {
+                        val newCard = drawableDeck.removeAt(0)
+                        myCards.add(newCard)
+
+                        // Update UI
+                        myCardsLayout.removeAllViews()
+                        for (card in myCards) {
+                            addCardImageToLayout(myCardsLayout, card.drawableID, card)
+                        }
+
+                        cardsLeftTextView.text = "${drawableDeck.size}"
+
+                        Toast.makeText(this, "Hyper-Thinker: Drew ${newCard.cardName} of ${newCard.cardSuit}!", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this, "Hyper-Thinker: Deck is empty!", Toast.LENGTH_SHORT).show()
+                    }
+
+                    PowerUpManager.markPowerUpUsed(this)
+                    powerUpUsed = true
+                }
+            }
+
+            PowerUpManager.CLUELESS_CHAOS -> {
+                // Enemy draws a card
+                if (!powerUpUsed) {
+                    if (drawableDeck.isNotEmpty()) {
+                        val newCard = drawableDeck.removeAt(0)
+                        enemyCards.add(newCard)
+
+                        // Update enemy UI
+                        enemyCardsLayout.removeAllViews()
+                        for (i in 0 until enemyCards.size) {
+                            addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
+                        }
+
+                        cardsLeftTextView.text = "${drawableDeck.size}"
+
+                        Toast.makeText(this, "Clueless Chaos: Enemy drew a card!", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this, "Clueless Chaos: Deck is empty!", Toast.LENGTH_SHORT).show()
+                    }
+
+                    PowerUpManager.markPowerUpUsed(this)
+                    powerUpUsed = true
+                }
+            }
         }
     }
 }
