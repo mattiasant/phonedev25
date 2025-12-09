@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import ut.cs.ee.phonedev25.data.StatsManager
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 
 class gameArena : AppCompatActivity() {
 
@@ -66,6 +67,16 @@ class gameArena : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_game_arena)
 
+        //------------------------------DISABLE BACK BUTTON----------------------------
+
+        //This disables the back button, so the player cannot cheat if bad cards. The only way to exit is play to the end or leave the app
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                Toast.makeText(this@gameArena, "Cannot leave", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        })
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -75,13 +86,12 @@ class gameArena : AppCompatActivity() {
         //------------------------------CARD SUFFLE----------------------------
 
         var kaardipakk: List<Card> = Deck.fullDeck
-        // * MUUDATUS NR. 2: Paki loome nüüd MutableList'ina
         drawableDeck = kaardipakk.shuffled().toMutableList()
         var kaartideArv = drawableDeck.size // Var on muutuv
 
         //------------------------------GAME------------------------------------
 
-        // vaated
+        // Views
         enemyCardsLayout = findViewById(R.id.enemyCardsLayout)
         myCardsLayout = findViewById(R.id.myCardsLayout)
         cardPlacement = findViewById(R.id.card_placement)
@@ -100,16 +110,14 @@ class gameArena : AppCompatActivity() {
 
         //------------------------------UI update------------------------------------
 
-        // Uuenda UI-d vastavalt algsele olekule
         updateGameUI()
 
-        // Jagame vastase kaardid ja eemaldame need pakist
+        // Give cards to enemy
         enemyCards = drawableDeck.take(5).toMutableList()
         drawableDeck.subList(0, 5).clear()
 
-        // ** VEA PARANDUS 2: INISTIALISEERIME MÄNGIJA KAARDID **
         myCards = drawableDeck.take(5).toMutableList()
-        // Eemaldame ka mängija kaardid pakist
+        // remove cards from the deck.
         drawableDeck.subList(0, 5).clear()
 
         //------------------------------GIVE CARDS------------------------------------
@@ -127,9 +135,9 @@ class gameArena : AppCompatActivity() {
         if (drawableDeck.isNotEmpty()) {
             val drawnTrumpCard = drawableDeck.removeAt(0)
 
-            // Salvestame nii masti kui ka kaardi enda
+            // save the mast
             trumpSuit = drawnTrumpCard.cardSuit
-            revealedTrumpCard = drawnTrumpCard // <--- LISA SEE RIDA
+            revealedTrumpCard = drawnTrumpCard
 
             trumpCardImage.setImageResource(drawnTrumpCard.drawableID)
             Toast.makeText(this, "The trump is: $trumpSuit", Toast.LENGTH_LONG).show()
@@ -140,7 +148,6 @@ class gameArena : AppCompatActivity() {
         }
         //------------------------------GAME LISTENER------------------------------------
 
-        // * MUUDATUS NR. 4: Kutsume välja uue kaardi võtmise funktsiooni
         setupPlaceButtonListener(myCardsLayout)
         setupRandomCardListener(myCardsLayout)
         setupTrumpCardTakeListener(myCardsLayout)
@@ -179,15 +186,15 @@ class gameArena : AppCompatActivity() {
             }
             GameTurn.ENEMY_DEFEND -> {
                 gameInfoTextView.text = "Enemy is defending"
-                placeButton.isEnabled = false // Keela nupud, kuni AI mõtleb
+                placeButton.isEnabled = false //
             }
             GameTurn.ENEMY_ATTACK -> {
                 gameInfoTextView.text = "Enemy attacked"
-                placeButton.isEnabled = false // AI ründab, sina ei saa "Place" panna
+                placeButton.isEnabled = false //
             }
             GameTurn.PLAYER_DEFEND -> {
                 gameInfoTextView.text = "Your turn to defend"
-                placeButton.isEnabled = true // "Place" nupp on nüüd kaitseks
+                placeButton.isEnabled = true //
             }
         }
     }
@@ -236,7 +243,7 @@ class gameArena : AppCompatActivity() {
             }
         }
 
-        // Määra kaardile marginaalid
+        // Put marginals to the card layout
         val marginEndPx = (4 * density).toInt() // 4dp vahet kaartide vahel
 
         // Create LayoutParams-id
@@ -293,7 +300,7 @@ class gameArena : AppCompatActivity() {
             // IF the deck is empty then the last trump card will be taken by the player or enemy.
             if (drawableDeck.isEmpty()) {
                 //We take the card
-                val cardToTake = revealedTrumpCard!! // !! sest me kontrollisime null'i esimeses if-is
+                val cardToTake = revealedTrumpCard!!
 
                 myCards.add(cardToTake)
                 checkForWinOrLoss()
@@ -347,28 +354,18 @@ class gameArena : AppCompatActivity() {
 
             //DEFENCE LOGIC
             else if (currentTurn == GameTurn.PLAYER_DEFEND) { //Its my turn
-
-                //You need to defend.
-
                 if (defendingCard != null) {
-
-                    // KONTROLL: Kas sa oled juba uue kaardi valinud (et kohe rünnata)?
                     if (selectedImageView != null) {
-                        // --- JAH, TAHAD KOHE RÜNNATA (ÜKS VAJUTUS) ---
-
-                        // 1. Korista vana laud (Manuaalselt, ilma viivituseta)
+                        // Clean the table or just remove the old card picture from the table
                         cardPlacement.setImageResource(0)
                         attackingCard = null
                         defendingCard = null
-
-                        // 2. Jaga kaardid kätte (sest eelmine voor on läbi)
+                        // Give cards
                         drawCards(myCards)
                         drawCards(enemyCards)
-
-                        // 3. Tee RÜNNAK uue kaardiga (Kopeeritud attack loogikast)
+                        // Do attack
                         val selectedCard = selectedImageView?.tag as Card
-
-                        // Eemalda kaart käest
+                        // Remove the attacked card from the hand
                         myCardsLayout.removeView(selectedImageView)
                         myCards.remove(selectedCard)
                         checkForWinOrLoss()
@@ -384,7 +381,6 @@ class gameArena : AppCompatActivity() {
                         updateGameUI()
 
                         runEnemyLogic()
-
                     } else {
                         clearTableAfterTurnAndContinue(
                             nextTurn = GameTurn.PLAYER_ATTACK,
@@ -395,12 +391,10 @@ class gameArena : AppCompatActivity() {
                     }
                     return@setOnClickListener
                 }
-
                 if (selectedImageView == null) {
                     Toast.makeText(this, "Vali kaart enne lauale panemist!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-
                 val selectedCard = selectedImageView?.tag as Card //Select the card imgae
 
                 if (attackingCard == null) {
@@ -445,7 +439,6 @@ class gameArena : AppCompatActivity() {
             attackingCard = null
             defendingCard = null
 
-            // 3. JÄTKA MÄNGUGA
             if (drawForPlayer) {
                 drawCards(myCards)
             }
@@ -462,15 +455,11 @@ class gameArena : AppCompatActivity() {
     }
 
     private fun runEnemyLogic() {
-
-        // --- AI KAITSE LOOGIKA ---
-        if (currentTurn == GameTurn.ENEMY_DEFEND) { //Its enemy's turn
-
+        if (currentTurn == GameTurn.ENEMY_DEFEND) { //Its enemy's turn and its locic.
             val cardToBeat = attackingCard!! // Find card to beat players card
-
             // 1. Find cards if the enemy can defend it.
             val validDefendingCards = enemyCards.filter { cardInHand ->
-                kasKaartLobA(cardInHand, cardToBeat) // Kasutame sama reeglit!
+                kasKaartLobA(cardInHand, cardToBeat)
             }
 
             val chosenCard = validDefendingCards.minByOrNull { it.cardStrength } //if can defend choose the weakest to keep the stronger
@@ -527,7 +516,6 @@ class gameArena : AppCompatActivity() {
                     enemyCardsLayout.removeView(it)
                 }
 
-                // 3. Pane kaart lauale ründeks
                 attackingCard = cardToAttackWith
                 cardPlacement.setImageResource(cardToAttackWith.drawableID)
                 rundekaartTextView.text = "Attacking: ${cardToAttackWith.cardSuit} ${cardToAttackWith.cardName}"
@@ -545,9 +533,7 @@ class gameArena : AppCompatActivity() {
     }
 
     private fun drawCards(cardsList: MutableList<Card>) {
-
         checkForWinOrLoss()
-
         val targetSize = 5 //checks the size
 
         while (cardsList.size < targetSize && drawableDeck.isNotEmpty()) {
@@ -591,19 +577,14 @@ class gameArena : AppCompatActivity() {
 
     private fun setupCardPlacementListener(myCardsLayout: LinearLayout) {
         cardPlacement.setOnClickListener {
-
-            // 1. Kontrolli, kas on üldse mängija kaitse kord
-            if (currentTurn != GameTurn.PLAYER_DEFEND) {
+            if (currentTurn != GameTurn.PLAYER_DEFEND) { //Check if player is defending
+                return@setOnClickListener
+            }
+            if (attackingCard == null) { //Check if there is any attacking cards on the table.
                 return@setOnClickListener
             }
 
-            // 2. Kontrolli, kas laual on kaart, mida võtta
-            if (attackingCard == null) {
-                return@setOnClickListener // Laual pole ründavat kaarti
-            }
-
-            // 3. Mängija võtab ründava kaardi endale
-            val cardToTake = attackingCard!!
+            val cardToTake = attackingCard!! //Attacker takes the card from the table
 
             myCards.add(cardToTake)
             checkForWinOrLoss()
@@ -615,23 +596,23 @@ class gameArena : AppCompatActivity() {
             clearTableAfterTurnAndContinue(
                 nextTurn = GameTurn.ENEMY_ATTACK,
                 delayAfterClear = 2000L,
-                drawForPlayer = false, // Sina (kes korjas) EI TÕMBA
-                drawForEnemy = true    // AI (ründaja) tõmbab
+                drawForPlayer = false,
+                drawForEnemy = true
             )
         }
     }
 
     private fun checkForWinOrLoss() {
-        // Win con: enemy has no cards left
-        if (enemyCards.isEmpty() && drawableDeck.isEmpty()) {
+        // Win con: I don't have any cards left
+        if (myCards.isEmpty() && drawableDeck.isEmpty()) {
             StatsManager.addWin(this)
             Toast.makeText(this, "You win!", Toast.LENGTH_LONG).show()
             finish()
             return
         }
 
-        // Loss condition: player have no cards left
-        if (myCards.isEmpty() && drawableDeck.isEmpty()) {
+        // Loss condition: Enemy has no cards left.
+        if (enemyCards.isEmpty() && drawableDeck.isEmpty()) {
             StatsManager.addLoss(this)
             Toast.makeText(this, "You lose!", Toast.LENGTH_LONG).show()
             finish()
@@ -661,15 +642,10 @@ class gameArena : AppCompatActivity() {
                     val availableTrumps = drawableDeck.filter { it.cardSuit == trumpSuit }
 
                     if (availableTrumps.isNotEmpty()) {
-                        // Take a random trump card
-                        val randomTrump = availableTrumps.random()
-                        drawableDeck.remove(randomTrump)
-
-                        // Add it to player's hand
-                        myCards.add(randomTrump)
-
-                        // Update UI
-                        myCardsLayout.removeAllViews()
+                        val randomTrump = availableTrumps.random() // Take a random trump card
+                        drawableDeck.remove(randomTrump) //Remove the trump card duplicate from the deck.
+                        myCards.add(randomTrump) // Add it to player's hand
+                        myCardsLayout.removeAllViews() // Update UI
                         for (card in myCards) {
                             addCardImageToLayout(myCardsLayout, card.drawableID, card)
                         }
@@ -680,15 +656,12 @@ class gameArena : AppCompatActivity() {
                     } else {
                         Toast.makeText(this, "Genesis Forge: No trump cards available!", Toast.LENGTH_SHORT).show()
                     }
-
                     PowerUpManager.markPowerUpUsed(this)
                     powerUpUsed = true
                 }
             }
-
             PowerUpManager.HYPER_THINKER -> {
-                // Player draws a card
-                if (!powerUpUsed) {
+                if (!powerUpUsed) { // Player draws a card
                     if (drawableDeck.isNotEmpty()) {
                         val newCard = drawableDeck.removeAt(0)
                         myCards.add(newCard)

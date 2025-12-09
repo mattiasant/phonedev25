@@ -46,3 +46,4 @@ gen-external-apklibs
 
 # End of https://www.toptal.com/developers/gitignore/api/android
 .kotlin/sessions/kotlin-compiler-5298321511880777340.salive
+/gradle
