@@ -19,14 +19,12 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 
 class gameArena : AppCompatActivity() {
-
     private var activePowerUp: String = PowerUpManager.NONE
     private var powerUpUsed: Boolean = false
-
+    private val playedCardsHistory: MutableList<Card> = mutableListOf() //This is for remembering what cards we have placed.
     private lateinit var enemyCards: MutableList<Card>
     private lateinit var myCards: MutableList<Card>
     private lateinit var drawableDeck: MutableList<Card>
-
     private var selectedImageView: ImageView? = null
     private lateinit var cardPlacement: ImageView
     private lateinit var rundekaartTextView: TextView
@@ -36,13 +34,8 @@ class gameArena : AppCompatActivity() {
     private lateinit var trumpCardImage: ImageView
     private var trumpSuit: String? = ""
     private var revealedTrumpCard: Card? = null
-
-    private lateinit var gameInfoTextView: TextView // Viide 'gameInfo' tekstile
-    private lateinit var killButton: Button // Viide 'killButton' nupule
-
-    // Muutuja, mis hoiab meeles, mis kaart on ründav kaart
+    private lateinit var gameInfoTextView: TextView // This is for game info
     private var attackingCard: Card? = null
-    // Muutuja, mis hoiab meeles, mis kaart on kaitsev kaart
     private var defendingCard: Card? = null
     private enum class GameTurn {
         PLAYER_ATTACK,  // Mängija valib kaardi ründeks
@@ -50,12 +43,8 @@ class gameArena : AppCompatActivity() {
         ENEMY_ATTACK,   // AI valib kaardi ründeks
         PLAYER_DEFEND   // Mängija valib kaardi kaitseks
     }
-
-    // Määra algne olek: Mängija alustab rünnakut
-    private var currentTurn: GameTurn = GameTurn.PLAYER_ATTACK
-
+    private var currentTurn: GameTurn = GameTurn.PLAYER_ATTACK //By rule player starts for right now.
     private lateinit var cardsLeftTextView: TextView
-
     private lateinit var enemyCardsLayout: LinearLayout
     private lateinit var myCardsLayout: LinearLayout
 
@@ -69,13 +58,14 @@ class gameArena : AppCompatActivity() {
 
         //------------------------------DISABLE BACK BUTTON----------------------------
 
+        /*
         //This disables the back button, so the player cannot cheat if bad cards. The only way to exit is play to the end or leave the app
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 Toast.makeText(this@gameArena, "Cannot leave", Toast.LENGTH_SHORT)
                     .show()
             }
-        })
+        }) */
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -155,6 +145,29 @@ class gameArena : AppCompatActivity() {
         setupPowerUpButtonListener()
     }
 
+    private fun recordPlayedCard(card: Card) { //This function records the placed cards and order
+        playedCardsHistory.add(card)
+    }
+
+    private fun getCardsToPickUp(): List<Card> { //Pick up cards
+        val count = playedCardsHistory.size
+
+        if (count == 0) return emptyList()
+
+        // When we have less than 5 cards
+        if (count < 5) {
+            if (count == 1) return emptyList() //Take until we have only 1 card left
+
+            return playedCardsHistory.subList(1, count).toList() //Give the cards to the player
+        } else {
+            return playedCardsHistory.takeLast(5) //If we have more than 5 cards on the table then we take 5
+        }
+    }
+
+    private fun removeCardsFromHistory(cards: List<Card>) { //Will remove the
+        playedCardsHistory.removeAll(cards)
+    }
+
     // Add this new function to handle power-up button clicks:
     private fun setupPowerUpButtonListener() {
         // Assuming you have a button with id "powerUpButton" in your layout
@@ -186,15 +199,15 @@ class gameArena : AppCompatActivity() {
             }
             GameTurn.ENEMY_DEFEND -> {
                 gameInfoTextView.text = "Enemy is defending"
-                placeButton.isEnabled = false //
+                placeButton.isEnabled = false
             }
             GameTurn.ENEMY_ATTACK -> {
                 gameInfoTextView.text = "Enemy attacked"
-                placeButton.isEnabled = false //
+                placeButton.isEnabled = false
             }
             GameTurn.PLAYER_DEFEND -> {
                 gameInfoTextView.text = "Your turn to defend"
-                placeButton.isEnabled = true //
+                placeButton.isEnabled = true
             }
         }
     }
@@ -335,6 +348,9 @@ class gameArena : AppCompatActivity() {
             if (currentTurn == GameTurn.PLAYER_ATTACK) { //if its my turn
 
                 val selectedCard = selectedImageView?.tag as Card //use the selected card
+
+                recordPlayedCard(selectedCard) //We remember the placed card
+
                 myCardsLayout.removeView(selectedImageView) //removes the card from layout
                 myCards.remove(selectedCard) //removes it from the list
                 checkForWinOrLoss()
@@ -344,7 +360,8 @@ class gameArena : AppCompatActivity() {
                 attackingCard = selectedCard //put it to the table and show it
                 cardPlacement.setImageResource(selectedCard.drawableID)
                 rundekaartTextView.text = "Attacking: ${selectedCard.cardSuit} ${selectedCard.cardName}"
-                kaitsekaartTextView.text = "Defending: ..." //
+
+                kaitsekaartTextView.text = "Defending: ..."
 
                 currentTurn = GameTurn.ENEMY_DEFEND //Its now enemy's turn
                 updateGameUI() // update the UI and text
@@ -392,17 +409,17 @@ class gameArena : AppCompatActivity() {
                     return@setOnClickListener
                 }
                 if (selectedImageView == null) {
-                    Toast.makeText(this, "Vali kaart enne lauale panemist!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "You need to choose the card before pressing the button", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
                 val selectedCard = selectedImageView?.tag as Card //Select the card imgae
 
                 if (attackingCard == null) {
-                    Toast.makeText(this, "Pole kaarti, mida rünnata!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "There is not card to attack with!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
 
-                val canDefend = kasKaartLobA(selectedCard, attackingCard!!) // Pead ise looma selle funktsiooni!
+                val canDefend = kasKaartLobA(selectedCard, attackingCard!!)
 
                 if (canDefend) { //if the card can defend
                     myCardsLayout.removeView(selectedImageView)
@@ -412,9 +429,11 @@ class gameArena : AppCompatActivity() {
 
                     defendingCard = selectedCard
 
+                    recordPlayedCard(selectedCard) //We remember
+
                     //Update text
                     kaitsekaartTextView.text = "Defending: ${selectedCard.cardSuit} ${selectedCard.cardName}"
-                    cardPlacement.setImageResource(selectedCard.drawableID) // Kuva kaitsva kaardi pilt laua
+                    cardPlacement.setImageResource(selectedCard.drawableID)
                     updateGameUI()
 
                     gameInfoTextView.text = "Your time to attack!"
@@ -432,6 +451,8 @@ class gameArena : AppCompatActivity() {
     private fun clearTableAfterTurnAndContinue(nextTurn: GameTurn, delayAfterClear: Long, drawForPlayer: Boolean, drawForEnemy: Boolean) {
         lifecycleScope.launch { //Waiting and updates the mechanics and UI in the game
             kotlinx.coroutines.delay(delayAfterClear)
+
+            playedCardsHistory.clear() //Cleans the tabel after the new attack/defence, unless we took up 5 cards
 
             cardPlacement.setImageResource(0) //Delete the old text to replace with the new.
             rundekaartTextView.text = "Attacking:"
@@ -473,6 +494,9 @@ class gameArena : AppCompatActivity() {
                 }
 
                 defendingCard = chosenCard
+
+                recordPlayedCard(chosenCard) //We remember the placed card
+
                 kaitsekaartTextView.text = "Defending: ${chosenCard.cardSuit} ${chosenCard.cardName}"
                 cardPlacement.setImageResource(chosenCard.drawableID)
                 updateGameUI()
@@ -487,13 +511,27 @@ class gameArena : AppCompatActivity() {
                 )
                 return
             } else {
-                // AI cannot defend and takes a new card.
-                val cardToBeat = attackingCard!! // takes the attacking card
-                Toast.makeText(this, "Enemy took a card", Toast.LENGTH_SHORT).show()
+                val cardsToTake = getCardsToPickUp()
 
-                enemyCards.add(cardToBeat)
-                checkForWinOrLoss()
-                addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
+                if (cardsToTake.isNotEmpty()) {
+                    enemyCards.addAll(cardsToTake)
+                    removeCardsFromHistory(cardsToTake)
+
+                    // fix visual cards
+                    for (i in cardsToTake.indices) {
+                        addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
+                    }
+                    Toast.makeText(this, "Enemy took ${cardsToTake.size} cards", Toast.LENGTH_SHORT).show()
+                } else {
+                    // If he cannot take then it will take the only card on the table
+                    val cardToBeat = attackingCard!!
+                    enemyCards.add(cardToBeat)
+                    playedCardsHistory.remove(cardToBeat)
+                    addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
+                    Toast.makeText(this, "Enemy took the card", Toast.LENGTH_SHORT).show()
+                }
+
+                checkForWinOrLoss() //Added check for win or loss
 
                 clearTableAfterTurnAndContinue(
                     nextTurn = GameTurn.PLAYER_ATTACK,
@@ -517,6 +555,9 @@ class gameArena : AppCompatActivity() {
                 }
 
                 attackingCard = cardToAttackWith
+
+                recordPlayedCard(cardToAttackWith)
+
                 cardPlacement.setImageResource(cardToAttackWith.drawableID)
                 rundekaartTextView.text = "Attacking: ${cardToAttackWith.cardSuit} ${cardToAttackWith.cardName}"
                 kaitsekaartTextView.text = "Defending: ..."
@@ -577,21 +618,31 @@ class gameArena : AppCompatActivity() {
 
     private fun setupCardPlacementListener(myCardsLayout: LinearLayout) {
         cardPlacement.setOnClickListener {
-            if (currentTurn != GameTurn.PLAYER_DEFEND) { //Check if player is defending
+            if (currentTurn != GameTurn.PLAYER_DEFEND) {
                 return@setOnClickListener
             }
-            if (attackingCard == null) { //Check if there is any attacking cards on the table.
+            if (playedCardsHistory.isEmpty()) { //We will check if there is any cards in the history list.
                 return@setOnClickListener
             }
 
-            val cardToTake = attackingCard!! //Attacker takes the card from the table
+            val cardsToTake = getCardsToPickUp() //õCards to pick up.
 
-            myCards.add(cardToTake)
+            if (cardsToTake.isEmpty()) {
+                Toast.makeText(this, "Cannot take the first card!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            myCards.addAll(cardsToTake) //We will add these cards to your hand.
+            removeCardsFromHistory(cardsToTake) //remove the cards from the history.
+
             checkForWinOrLoss()
-            addCardImageToLayout(myCardsLayout, cardToTake.drawableID, cardToTake)
+
+            for (card in cardsToTake) { //We will update the card pictures.
+                addCardImageToLayout(myCardsLayout, card.drawableID, card)
+            }
             StatsManager.addCardPickedUp(this)
 
-            Toast.makeText(this, "You took a card, its now enemy's turn to attack.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "You took ${cardsToTake.size} cards up, its now enemy's turn to attack.", Toast.LENGTH_LONG).show()
 
             clearTableAfterTurnAndContinue(
                 nextTurn = GameTurn.ENEMY_ATTACK,
