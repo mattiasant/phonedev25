@@ -690,7 +690,8 @@ class gameArena : AppCompatActivity() {
                 StatsManager.addWin(this)
                 PowerUpManager.markPowerUpUsed(this)
                 powerUpUsed = true
-                finish()
+                StatsManager.addWin(this)
+                goToResultPage(isWin = true)
             }
 
             PowerUpManager.GENESIS_FORGE -> {
