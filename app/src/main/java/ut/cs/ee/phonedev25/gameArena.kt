@@ -1,5 +1,6 @@
 package ut.cs.ee.phonedev25
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -653,20 +654,26 @@ class gameArena : AppCompatActivity() {
         }
     }
 
+    private fun goToResultPage(isWin: Boolean) {
+        val intent = Intent(this, GameResultPage::class.java)
+        intent.putExtra(GameResultPage.EXTRA_IS_WIN, isWin)
+        startActivity(intent)
+        finish()
+    }
+
     private fun checkForWinOrLoss() {
-        // Win con: I don't have any cards left
+
+        // Win condition: player has no cards left and deck is empty
         if (myCards.isEmpty() && drawableDeck.isEmpty()) {
             StatsManager.addWin(this)
-            Toast.makeText(this, "You win!", Toast.LENGTH_LONG).show()
-            finish()
+            goToResultPage(isWin = true)
             return
         }
 
-        // Loss condition: Enemy has no cards left.
+        // Loss condition: enemy has no cards left and deck is empty
         if (enemyCards.isEmpty() && drawableDeck.isEmpty()) {
             StatsManager.addLoss(this)
-            Toast.makeText(this, "You lose!", Toast.LENGTH_LONG).show()
-            finish()
+            goToResultPage(isWin = false)
             return
         }
     }

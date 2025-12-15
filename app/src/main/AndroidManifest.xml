@@ -51,6 +51,9 @@
         <activity
             android:name=".AnimationPAge"
             android:exported="false" />
+        <activity
+            android:name=".GameResultPage"
+            android:exported="false" />'
     </application>
 
 </manifest>

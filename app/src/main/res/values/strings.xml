@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">phonedev25</string>
+    <string name="result_victory_title">Victory!</string>
+    <string name="result_victory_message">Congratulations! You won the game!</string>
+    <string name="result_defeat_title">Defeat</string>
+    <string name="result_defeat_message">Better luck next time!</string>
+    <string name="play_again">Play Again</string>
+    <string name="main_menu">Main Menu</string>
+    <string name="view_statistics">View Statistics</string>
 </resources>
