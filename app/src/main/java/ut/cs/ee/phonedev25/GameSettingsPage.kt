@@ -38,14 +38,23 @@ class GameSettingsPage : AppCompatActivity() {
             insets
         }
 
-        // Back buttons
-        findViewById<ImageView>(R.id.imageView4).setOnClickListener { finish() }
+        // Back button with animation
+        findViewById<ImageView>(R.id.imageView4).setOnClickListener { btn ->
+            AnimationManager.animateBackButton(btn as ImageView, this) {
+                finish()
+                AnimationManager.applyPageTransition(this, R.anim.slide_in_left, R.anim.slide_out_right)
+            }
+        }
 
         // Theme switch
         val themeSwitch = findViewById<Switch>(R.id.themeSwitch)
         themeSwitch.isChecked = isDarkMode
 
-        themeSwitch.setOnCheckedChangeListener { _, isChecked ->
+        // Apply entrance animation to the switch
+        AnimationManager.animateEntrance(themeSwitch)
+
+        themeSwitch.setOnCheckedChangeListener { switchView, isChecked ->
+            AnimationManager.animateSwitch(switchView as Switch, this)
             prefs.edit().putBoolean("dark_mode", isChecked).apply()
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)

@@ -53,17 +53,33 @@ class Join_Game : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        findViewById<ImageView>(R.id.imageView3).setOnClickListener {
-            finish()
+
+        // Back button with animation
+        findViewById<ImageView>(R.id.imageView3).setOnClickListener { btn ->
+            AnimationManager.animateBackButton(btn as ImageView, this) {
+                finish()
+                AnimationManager.applyPageTransition(this, R.anim.slide_in_left, R.anim.slide_out_right)
+            }
         }
 
-        findViewById<Button>(R.id.startGame).setOnClickListener {
+        val startGameButton = findViewById<Button>(R.id.startGame)
+
+        // Apply entrance animation to start button
+        AnimationManager.animateEntrance(startGameButton)
+
+        startGameButton.setOnClickListener { btn ->
+            AnimationManager.animateButtonClick(btn, this)
             startActivity(Intent(this, gameArena::class.java))
+            AnimationManager.applyPageTransition(this, R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
         // --- QR Code Feature ---
         val makeCodeText = findViewById<TextView>(R.id.makeCode_text)
         val makeCodeImage = findViewById<ImageView>(R.id.imageView5)
+
+        // Apply entrance animations
+        AnimationManager.animateEntrance(makeCodeText)
+        AnimationManager.animateEntrance(makeCodeImage)
 
         val generateAction = {
             // generate a new random code *each time*
@@ -77,12 +93,22 @@ class Join_Game : AppCompatActivity() {
             }
         }
 
-        makeCodeText.setOnClickListener { generateAction() }
-        makeCodeImage.setOnClickListener { generateAction() }
+        makeCodeText.setOnClickListener { view ->
+            AnimationManager.animateButtonClick(view, this)
+            generateAction()
+        }
+        makeCodeImage.setOnClickListener { view ->
+            AnimationManager.animateButtonClick(view, this)
+            generateAction()
+        }
 
         // --- Scan QR ---
         val scanText = findViewById<TextView>(R.id.ScanCode_text)
         val scanImage = findViewById<ImageView>(R.id.imageView6)
+
+        // Apply entrance animations
+        AnimationManager.animateEntrance(scanText)
+        AnimationManager.animateEntrance(scanImage)
 
         val scanAction = {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
@@ -94,14 +120,20 @@ class Join_Game : AppCompatActivity() {
             }
         }
 
-        scanText.setOnClickListener { scanAction() }
-        scanImage.setOnClickListener { scanAction() }
+        scanText.setOnClickListener { view ->
+            AnimationManager.animateButtonClick(view, this)
+            scanAction()
+        }
+        scanImage.setOnClickListener { view ->
+            AnimationManager.animateButtonClick(view, this)
+            scanAction()
+        }
 
         qrViewModel.error.observe(this) { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
-
     }
+
     fun showQrPopup(code: String, bitmap: Bitmap) {
         // Dismiss previous popup if one is open
         activeDialog?.dismiss()
@@ -114,16 +146,25 @@ class Join_Game : AppCompatActivity() {
         qrImage.setImageBitmap(bitmap)
         codeText.text = code
 
+        // Apply entrance animations to dialog elements
+        AnimationManager.animateEntrance(qrImage)
+        AnimationManager.animateEntrance(codeText)
+        AnimationManager.animateEntrance(closeButton)
+
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setCancelable(false)
             .create()
 
-        closeButton.setOnClickListener { dialog.dismiss() }
+        closeButton.setOnClickListener { btn ->
+            AnimationManager.animateButtonClick(btn, this)
+            dialog.dismiss()
+        }
 
         dialog.show()
         activeDialog = dialog
     }
+
     fun showQrScanPopup() {
         activeDialog?.dismiss()
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_qr_scan_popup, null)
@@ -131,12 +172,20 @@ class Join_Game : AppCompatActivity() {
         val closeButton = dialogView.findViewById<Button>(R.id.closeScanButton)
         val previewView = dialogView.findViewById<PreviewView>(R.id.cameraPreview)
 
+        // Apply entrance animations
+        scanInfoText?.let { AnimationManager.animateEntrance(it) }
+        AnimationManager.animateEntrance(closeButton)
+        AnimationManager.animateEntrance(previewView)
+
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setCancelable(false)
             .create()
 
-        closeButton.setOnClickListener { dialog.dismiss() }
+        closeButton.setOnClickListener { btn ->
+            AnimationManager.animateButtonClick(btn, this)
+            dialog.dismiss()
+        }
 
         // Start camera preview
         startCamera(previewView)
@@ -189,7 +238,6 @@ class Join_Game : AppCompatActivity() {
                                 lastDetectedValue = value
                                 lastDetectionTime = currentTime
                             }
-
                         }
                     }
                 }

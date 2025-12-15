@@ -20,16 +20,31 @@ class StorePage : AppCompatActivity() {
             insets
         }
 
-        findViewById<ImageView>( R.id.imageView19).setOnClickListener {
-            finish()
+        // Back button with animation
+        findViewById<ImageView>(R.id.imageView19).setOnClickListener { btn ->
+            AnimationManager.animateBackButton(btn as ImageView, this) {
+                finish()
+                AnimationManager.applyPageTransition(this, R.anim.slide_in_left, R.anim.slide_out_right)
+            }
         }
 
-        findViewById<Button>(R.id.playNupp4).setOnClickListener {
+        val powerUpsButton = findViewById<Button>(R.id.playNupp4)
+        val animationButton = findViewById<Button>(R.id.playNupp3)
+
+        // Apply entrance animations
+        AnimationManager.animateEntrance(powerUpsButton)
+        AnimationManager.animateEntrance(animationButton)
+
+        powerUpsButton.setOnClickListener { btn ->
+            AnimationManager.animateButtonClick(btn, this)
             startActivity(Intent(this, PowerUpsActivity::class.java))
+            AnimationManager.applyPageTransition(this, R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
-        findViewById<Button>(R.id.playNupp3).setOnClickListener {
+        animationButton.setOnClickListener { btn ->
+            AnimationManager.animateButtonClick(btn, this)
             startActivity(Intent(this, AnimationPAge::class.java))
+            AnimationManager.applyPageTransition(this, R.anim.slide_in_right, R.anim.slide_out_left)
         }
     }
 }

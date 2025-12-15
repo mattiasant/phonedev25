@@ -42,8 +42,12 @@ class AnimationPAge : AppCompatActivity() {
         switch3 = findViewById(R.id.switch3)
         themeSwitch = findViewById(R.id.themeSwitch)
 
-        // Back button
-        backArrow.setOnClickListener { finish() }
+        backArrow.setOnClickListener { btn ->
+            AnimationManager.animateBackButton(btn as ImageView, this) {
+                finish()
+                AnimationManager.applyPageTransition(this, R.anim.slide_in_left, R.anim.slide_out_right)
+            }
+        }
 
         // Load current preferences into switches
         switch1.isChecked = AnimationManager.getPreference(this, AnimationManager.getBackAnimationKey())

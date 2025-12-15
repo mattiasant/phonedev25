@@ -25,13 +25,22 @@ class StatisticsPage : AppCompatActivity() {
             insets
         }
 
-        findViewById<ImageView>(R.id.imageView).setOnClickListener {
-            finish()
+        // Back button with animation
+        findViewById<ImageView>(R.id.imageView).setOnClickListener { btn ->
+            AnimationManager.animateBackButton(btn as ImageView, this) {
+                finish()
+                AnimationManager.applyPageTransition(this, R.anim.slide_in_left, R.anim.slide_out_right)
+            }
         }
 
         cardsPlacedText   = findViewById(R.id.textView10)
         cardsPickedUpText = findViewById(R.id.textView6)
         winrateText       = findViewById(R.id.textView12)
+
+        // Apply entrance animations to text views
+        AnimationManager.animateEntrance(cardsPlacedText)
+        AnimationManager.animateEntrance(cardsPickedUpText)
+        AnimationManager.animateEntrance(winrateText)
 
         // Load stats from StatsManager
         updateStatistics()
