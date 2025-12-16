@@ -17,6 +17,8 @@ class AnimationPAge : AppCompatActivity() {
     private lateinit var switch2: Switch
     private lateinit var switch3: Switch
     private lateinit var themeSwitch: Switch
+    private lateinit var cardSwitch: Switch
+
     private lateinit var backArrow: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +42,7 @@ class AnimationPAge : AppCompatActivity() {
         switch1 = findViewById(R.id.switch1)
         switch2 = findViewById(R.id.switch2)
         switch3 = findViewById(R.id.switch3)
+        cardSwitch = findViewById(R.id.cardSwitch)
         themeSwitch = findViewById(R.id.themeSwitch)
 
         backArrow.setOnClickListener { btn ->
@@ -54,6 +57,8 @@ class AnimationPAge : AppCompatActivity() {
         switch2.isChecked = AnimationManager.getPreference(this, AnimationManager.getSwitchAnimationKey())
         switch3.isChecked = AnimationManager.getPreference(this, AnimationManager.getButtonAnimationKey())
         themeSwitch.isChecked = AnimationManager.getPreference(this, AnimationManager.getPageTransitionKey())
+        cardSwitch.isChecked = AnimationManager.getPreference(this, AnimationManager.getCardAnimationKey())
+
 
         // Save preferences when switches are toggled
         switch1.setOnCheckedChangeListener { _, isChecked ->
@@ -68,5 +73,11 @@ class AnimationPAge : AppCompatActivity() {
         themeSwitch.setOnCheckedChangeListener { _, isChecked ->
             AnimationManager.setPreference(this, AnimationManager.getPageTransitionKey(), isChecked)
         }
+
+        cardSwitch.setOnCheckedChangeListener { _, isChecked ->
+            AnimationManager.setPreference(this,AnimationManager.getCardAnimationKey(),isChecked)
+        }
+
+
     }
 }

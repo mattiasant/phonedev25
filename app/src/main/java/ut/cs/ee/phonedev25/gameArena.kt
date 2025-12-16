@@ -38,6 +38,9 @@ class gameArena : AppCompatActivity() {
     private lateinit var gameInfoTextView: TextView // This is for game info
     private var attackingCard: Card? = null
     private var defendingCard: Card? = null
+    private val PLAYER_CARD_ANIM_DURATION = 350L
+    private val ENEMY_RESPONSE_DELAY = 300L
+
     private enum class GameTurn {
         PLAYER_ATTACK,  // Mängija valib kaardi ründeks
         ENEMY_DEFEND,   // AI valib kaardi kaitseks
@@ -243,14 +246,14 @@ class gameArena : AppCompatActivity() {
                 // Checks if the card is selected
                 if (clickedView == selectedImageView) {
                     // If its been selected then it ignores
-                    clickedView.translationY = 0f
+                    AnimationManager.animateCardDeselect(clickedView, this)
                     clickedView.elevation =0f
                     selectedImageView = null
                 } else {
                     //Otherwise bring back/keep down
                     selectedImageView?.translationY = 0f
                     selectedImageView?.elevation = 0f
-                    clickedView.translationY = moveUpDistancePx
+                    AnimationManager.animateCardSelect(clickedView, this)
                     clickedView.elevation = 20f
                     selectedImageView = clickedView as ImageView
                 }
@@ -271,6 +274,10 @@ class gameArena : AppCompatActivity() {
         params.marginEnd = marginEndPx
         imageView.layoutParams = params
         layout.addView(imageView) //Adds the card picture
+        imageView.post {
+            AnimationManager.animateCardDraw(imageView, this)
+        }
+
     }
     private fun setupRandomCardListener(myCardsLayout: LinearLayout) {
         randomCardImage.setOnClickListener {
@@ -352,14 +359,27 @@ class gameArena : AppCompatActivity() {
 
                 recordPlayedCard(selectedCard) //We remember the placed card
 
-                myCardsLayout.removeView(selectedImageView) //removes the card from layout
+                val placedView = selectedImageView!!
+                val sourceView = selectedImageView!!
+                val card = sourceView.tag as Card
+
+                AnimationManager.animateCardFlyToTable(
+                    activity = this,
+                    sourceView = sourceView,
+                    targetView = cardPlacement,
+                    drawableRes = card.drawableID
+                ) {
+                    myCardsLayout.removeView(sourceView)
+                    cardPlacement.setImageResource(card.drawableID)
+                }
+
+
                 myCards.remove(selectedCard) //removes it from the list
                 checkForWinOrLoss()
                 selectedImageView = null //deltes the image
                 StatsManager.addCardPlaced(this) //stat card placed +1
 
                 attackingCard = selectedCard //put it to the table and show it
-                cardPlacement.setImageResource(selectedCard.drawableID)
                 rundekaartTextView.text = "Attacking: ${selectedCard.cardSuit} ${selectedCard.cardName}"
 
                 kaitsekaartTextView.text = "Defending: ..."
@@ -367,7 +387,11 @@ class gameArena : AppCompatActivity() {
                 currentTurn = GameTurn.ENEMY_DEFEND //Its now enemy's turn
                 updateGameUI() // update the UI and text
 
-                runEnemyLogic() //Call out the enemy's turn
+                lifecycleScope.launch {
+                    kotlinx.coroutines.delay(PLAYER_CARD_ANIM_DURATION + ENEMY_RESPONSE_DELAY)
+                    runEnemyLogic()
+                }
+                //Call out the enemy's turn
             }
 
             //DEFENCE LOGIC
@@ -384,7 +408,20 @@ class gameArena : AppCompatActivity() {
                         // Do attack
                         val selectedCard = selectedImageView?.tag as Card
                         // Remove the attacked card from the hand
-                        myCardsLayout.removeView(selectedImageView)
+                        val placedView = selectedImageView!!
+                        val sourceView = selectedImageView!!
+                        val card = sourceView.tag as Card
+
+                        AnimationManager.animateCardFlyToTable(
+                            activity = this,
+                            sourceView = sourceView,
+                            targetView = cardPlacement,
+                            drawableRes = card.drawableID
+                        ) {
+                            myCardsLayout.removeView(sourceView)
+                            cardPlacement.setImageResource(card.drawableID)
+                        }
+
                         myCards.remove(selectedCard)
                         checkForWinOrLoss()
                         selectedImageView = null
@@ -398,7 +435,11 @@ class gameArena : AppCompatActivity() {
                         currentTurn = GameTurn.ENEMY_DEFEND
                         updateGameUI()
 
-                        runEnemyLogic()
+                        lifecycleScope.launch {
+                            kotlinx.coroutines.delay(PLAYER_CARD_ANIM_DURATION + ENEMY_RESPONSE_DELAY)
+                            runEnemyLogic()
+                        }
+
                     } else {
                         clearTableAfterTurnAndContinue(
                             nextTurn = GameTurn.PLAYER_ATTACK,
@@ -423,7 +464,20 @@ class gameArena : AppCompatActivity() {
                 val canDefend = kasKaartLobA(selectedCard, attackingCard!!)
 
                 if (canDefend) { //if the card can defend
-                    myCardsLayout.removeView(selectedImageView)
+                    val placedView = selectedImageView!!
+                    val sourceView = selectedImageView!!
+                    val card = sourceView.tag as Card
+
+                    AnimationManager.animateCardFlyToTable(
+                        activity = this,
+                        sourceView = sourceView,
+                        targetView = cardPlacement,
+                        drawableRes = card.drawableID
+                    ) {
+                        myCardsLayout.removeView(sourceView)
+                        cardPlacement.setImageResource(card.drawableID)
+                    }
+
                     myCards.remove(selectedCard)
                     checkForWinOrLoss()
                     selectedImageView = null
@@ -435,11 +489,17 @@ class gameArena : AppCompatActivity() {
                     //Update text
                     kaitsekaartTextView.text = "Defending: ${selectedCard.cardSuit} ${selectedCard.cardName}"
                     cardPlacement.setImageResource(selectedCard.drawableID)
-                    updateGameUI()
+                    placeButton.isEnabled = false
+                    gameInfoTextView.text = "Preparing next attack…"
 
-                    gameInfoTextView.text = "Your time to attack!"
+                    lifecycleScope.launch {
+                        kotlinx.coroutines.delay(PLAYER_CARD_ANIM_DURATION + 200L)
 
-                    Toast.makeText(this, "Defence successful!", Toast.LENGTH_SHORT).show()
+                        currentTurn = GameTurn.PLAYER_ATTACK
+                        updateGameUI()
+                        gameInfoTextView.text = "Your time to attack!"
+                    }
+
                 } else {
                     // If the selected card cannot defend or kill the enemy's card.
                     Toast.makeText(this, "This card cannot defend, try another!", Toast.LENGTH_SHORT).show()
@@ -490,9 +550,26 @@ class gameArena : AppCompatActivity() {
 
                 enemyCards.remove(chosenCard)
                 checkForWinOrLoss()
-                (enemyCardsLayout.getChildAt(0) as? ImageView)?.let {
-                    enemyCardsLayout.removeView(it)
+                (enemyCardsLayout.getChildAt(0) as? ImageView)?.let { enemyCardView ->
+
+                    AnimationManager.animateCardFlyToTable(
+                        activity = this,
+                        sourceView = enemyCardView,
+                        targetView = cardPlacement,
+                        drawableRes = R.drawable.cardback
+                    ) {
+                        enemyCardsLayout.removeView(enemyCardView)
+                        cardPlacement.setImageResource(chosenCard.drawableID)
+                    }
+                    cardPlacement.rotationY = 90f
+                    cardPlacement.animate()
+                        .rotationY(0f)
+                        .setDuration(200)
+                        .start()
+
                 }
+
+
 
                 defendingCard = chosenCard
 
@@ -500,6 +577,17 @@ class gameArena : AppCompatActivity() {
 
                 kaitsekaartTextView.text = "Defending: ${chosenCard.cardSuit} ${chosenCard.cardName}"
                 cardPlacement.setImageResource(chosenCard.drawableID)
+                cardPlacement.scaleX = 0.7f
+                cardPlacement.scaleY = 0.7f
+                cardPlacement.alpha = 0f
+
+                cardPlacement.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .alpha(1f)
+                    .setDuration(250)
+                    .start()
+
                 updateGameUI()
 
                 Toast.makeText(this, "Enemy Defended", Toast.LENGTH_SHORT).show()
@@ -551,9 +639,20 @@ class gameArena : AppCompatActivity() {
                 enemyCards.remove(cardToAttackWith) //remove the card from the enemy's deck list
                 checkForWinOrLoss()
                 //Update the enemy cards UI layout
-                (enemyCardsLayout.getChildAt(0) as? ImageView)?.let {
-                    enemyCardsLayout.removeView(it)
+                (enemyCardsLayout.getChildAt(0) as? ImageView)?.let { enemyCardView ->
+
+                    AnimationManager.animateCardFlyToTable(
+                        activity = this,
+                        sourceView = enemyCardView,
+                        targetView = cardPlacement,
+                        drawableRes = R.drawable.cardback
+                    ) {
+                        enemyCardsLayout.removeView(enemyCardView)
+                        cardPlacement.setImageResource(cardToAttackWith.drawableID)
+                    }
                 }
+
+
 
                 attackingCard = cardToAttackWith
 
