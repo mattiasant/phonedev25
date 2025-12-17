@@ -73,13 +73,6 @@ class Join_Game : AppCompatActivity() {
             AnimationManager.applyPageTransition(this, R.anim.slide_in_right, R.anim.slide_out_left)
         }
 
-        // --- QR Code Feature ---
-        val makeCodeText = findViewById<TextView>(R.id.makeCode_text)
-        val makeCodeImage = findViewById<ImageView>(R.id.imageView5)
-
-        // Apply entrance animations
-        AnimationManager.animateEntrance(makeCodeText)
-        AnimationManager.animateEntrance(makeCodeImage)
 
         val generateAction = {
             // generate a new random code *each time*
@@ -93,23 +86,6 @@ class Join_Game : AppCompatActivity() {
             }
         }
 
-        makeCodeText.setOnClickListener { view ->
-            AnimationManager.animateButtonClick(view, this)
-            generateAction()
-        }
-        makeCodeImage.setOnClickListener { view ->
-            AnimationManager.animateButtonClick(view, this)
-            generateAction()
-        }
-
-        // --- Scan QR ---
-        val scanText = findViewById<TextView>(R.id.ScanCode_text)
-        val scanImage = findViewById<ImageView>(R.id.imageView6)
-
-        // Apply entrance animations
-        AnimationManager.animateEntrance(scanText)
-        AnimationManager.animateEntrance(scanImage)
-
         val scanAction = {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED
@@ -118,19 +94,6 @@ class Join_Game : AppCompatActivity() {
             } else {
                 requestCameraPermission.launch(Manifest.permission.CAMERA)
             }
-        }
-
-        scanText.setOnClickListener { view ->
-            AnimationManager.animateButtonClick(view, this)
-            scanAction()
-        }
-        scanImage.setOnClickListener { view ->
-            AnimationManager.animateButtonClick(view, this)
-            scanAction()
-        }
-
-        qrViewModel.error.observe(this) { message ->
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }
 

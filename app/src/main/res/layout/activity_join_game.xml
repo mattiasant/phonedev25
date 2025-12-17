@@ -12,52 +12,28 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="40dp"
-        android:layout_marginBottom="68dp"
+
+        android:layout_marginBottom="297dp"
         android:background="@drawable/custom_button"
 
         android:text="Start Game"
         android:textSize="40dp"
-        app:layout_constraintBottom_toTopOf="@+id/imageView5"
-
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/ScanCode_text"
-        android:layout_width="125dp"
-        android:layout_height="92dp"
-        android:layout_marginEnd="52dp"
-        android:layout_marginBottom="20dp"
-        android:text="Scan QR Code"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <TextView
-        android:id="@+id/makeCode_text"
-        android:layout_width="125dp"
-        android:layout_height="86dp"
-        android:layout_marginStart="44dp"
-        android:layout_marginBottom="28dp"
-        android:text="Make QR Code"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/joinGame_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Join Game"
-        android:textSize="60sp"
+        android:layout_marginTop="246dp"
+        android:text="Ready for game?"
 
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="45sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
 
-        android:layout_marginTop="246dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView3"
@@ -68,25 +44,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/arrowback2" />
-
-    <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="61dp"
-        android:layout_marginBottom="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/makeCode_text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/makeqr2" />
-
-    <ImageView
-        android:id="@+id/imageView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="63dp"
-        android:layout_marginBottom="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/ScanCode_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/camera2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

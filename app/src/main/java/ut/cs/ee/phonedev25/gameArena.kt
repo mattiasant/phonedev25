@@ -149,20 +149,21 @@ class gameArena : AppCompatActivity() {
         setupPowerUpButtonListener()
     }
 
+    //------------------------------PICK UP CARDS WHEN CANNOT ATTACK------------------------------------
+
     private fun recordPlayedCard(card: Card) { //This function records the placed cards and order
         playedCardsHistory.add(card)
     }
 
-    private fun getCardsToPickUp(): List<Card> { //Pick up cards
+    private fun getCardsToPickUp(): List<Card> { // Pick up cards logic
         val count = playedCardsHistory.size
 
-        if (count == 0) return emptyList()
-        val cardsToConsider = playedCardsHistory.subList(1, count)
+        if (count <= 1) return emptyList()
 
-        if (cardsToConsider.size <= 5) {
-            return cardsToConsider.toList()
-        } else {
-            return cardsToConsider.take(5).toList()
+        return if (count > 5) { //If there is more than 5 cards then take 5
+            playedCardsHistory.takeLast(5)
+        } else { //if there 5 or less than take every card except the first card.
+            playedCardsHistory.drop(1)
         }
     }
 
@@ -511,9 +512,9 @@ class gameArena : AppCompatActivity() {
         lifecycleScope.launch { //Waiting and updates the mechanics and UI in the game
             kotlinx.coroutines.delay(delayAfterClear)
 
-            playedCardsHistory.clear() //Cleans the tabel after the new attack/defence, unless we took up 5 cards
+            //playedCardsHistory.clear() //Cleans the tabel after the new attack/defence, unless we took up 5 cards
 
-            cardPlacement.setImageResource(0) //Delete the old text to replace with the new.
+            //cardPlacement.setImageResource(0) //Delete the old text to replace with the new.
             rundekaartTextView.text = "Attacking:"
             kaitsekaartTextView.text = "Defending:"
             attackingCard = null
@@ -598,24 +599,16 @@ class gameArena : AppCompatActivity() {
                 )
                 return
             } else {
-                val cardsToTakeIncludingAttacker = playedCardsHistory.toList()
+                val cardsToTake = getCardsToPickUp()
 
-                if (cardsToTakeIncludingAttacker.isNotEmpty()) {
-                    enemyCards.addAll(cardsToTakeIncludingAttacker)
-                    playedCardsHistory.clear()
+                if (cardsToTake.isNotEmpty()) {
+                    enemyCards.addAll(cardsToTake)
+                    removeCardsFromHistory(cardsToTake) // Eemaldame ajaloost!
 
-                    // fix visual cards
-                    for (i in cardsToTakeIncludingAttacker.indices) {
+                    for (i in cardsToTake.indices) {
                         addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
                     }
-                    Toast.makeText(this, "Enemy took ${cardsToTakeIncludingAttacker.size} cards", Toast.LENGTH_SHORT).show()
-                } else {
-                    // If he cannot take then it will take the only card on the table
-                    val cardToBeat = attackingCard!!
-                    enemyCards.add(cardToBeat)
-                    playedCardsHistory.remove(cardToBeat)
-                    addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
-                    Toast.makeText(this, "Enemy took the card", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Vastane võttis ${cardsToTake.size} kaarti", Toast.LENGTH_SHORT).show()
                 }
 
                 checkForWinOrLoss() //Added check for win or loss
@@ -649,8 +642,6 @@ class gameArena : AppCompatActivity() {
                         cardPlacement.setImageResource(cardToAttackWith.drawableID)
                     }
                 }
-
-
 
                 attackingCard = cardToAttackWith
 
@@ -719,20 +710,16 @@ class gameArena : AppCompatActivity() {
             if (currentTurn != GameTurn.PLAYER_DEFEND) {
                 return@setOnClickListener
             }
-            if (playedCardsHistory.isEmpty()) { //We will check if there is any cards in the history list.
-                return@setOnClickListener
-            }
 
-            val cardsToTake = playedCardsHistory.toList() //Cards to pick up.
+            val cardsToTake = getCardsToPickUp()
 
             if (cardsToTake.isEmpty()) {
-                // See ei tohiks tegelikult käivituda tänu eelnevale kontrollile.
-                Toast.makeText(this, "No cards to take!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            myCards.addAll(cardsToTake) //We will add these cards to your hand.
-            playedCardsHistory.clear() //remove the cards from the history.
+            myCards.addAll(cardsToTake)
+
+            removeCardsFromHistory(cardsToTake)
 
             checkForWinOrLoss()
 
