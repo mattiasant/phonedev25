@@ -66,7 +66,7 @@ class gameArena : AppCompatActivity() {
         //This disables the back button, so the player cannot cheat if bad cards. The only way to exit is play to the end or leave the app
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                Toast.makeText(this@gameArena, "Cannot leave", Toast.LENGTH_SHORT)
+                Toast.makeText(this@gameArena, "Cannot leave, sorry", Toast.LENGTH_SHORT)
                     .show()
             }
         }) */
@@ -81,7 +81,7 @@ class gameArena : AppCompatActivity() {
 
         var kaardipakk: List<Card> = Deck.fullDeck
         drawableDeck = kaardipakk.shuffled().toMutableList()
-        var kaartideArv = drawableDeck.size // Var on muutuv
+        var kaartideArv = drawableDeck.size // Var can change.
 
         //------------------------------GAME------------------------------------
 
@@ -157,14 +157,12 @@ class gameArena : AppCompatActivity() {
         val count = playedCardsHistory.size
 
         if (count == 0) return emptyList()
+        val cardsToConsider = playedCardsHistory.subList(1, count)
 
-        // When we have less than 5 cards
-        if (count < 5) {
-            if (count == 1) return emptyList() //Take until we have only 1 card left
-
-            return playedCardsHistory.subList(1, count).toList() //Give the cards to the player
+        if (cardsToConsider.size <= 5) {
+            return cardsToConsider.toList()
         } else {
-            return playedCardsHistory.takeLast(5) //If we have more than 5 cards on the table then we take 5
+            return cardsToConsider.take(5).toList()
         }
     }
 
@@ -600,17 +598,17 @@ class gameArena : AppCompatActivity() {
                 )
                 return
             } else {
-                val cardsToTake = getCardsToPickUp()
+                val cardsToTakeIncludingAttacker = playedCardsHistory.toList()
 
-                if (cardsToTake.isNotEmpty()) {
-                    enemyCards.addAll(cardsToTake)
-                    removeCardsFromHistory(cardsToTake)
+                if (cardsToTakeIncludingAttacker.isNotEmpty()) {
+                    enemyCards.addAll(cardsToTakeIncludingAttacker)
+                    playedCardsHistory.clear()
 
                     // fix visual cards
-                    for (i in cardsToTake.indices) {
+                    for (i in cardsToTakeIncludingAttacker.indices) {
                         addCardImageToLayout(enemyCardsLayout, R.drawable.cardback)
                     }
-                    Toast.makeText(this, "Enemy took ${cardsToTake.size} cards", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Enemy took ${cardsToTakeIncludingAttacker.size} cards", Toast.LENGTH_SHORT).show()
                 } else {
                     // If he cannot take then it will take the only card on the table
                     val cardToBeat = attackingCard!!
@@ -725,15 +723,16 @@ class gameArena : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val cardsToTake = getCardsToPickUp() //õCards to pick up.
+            val cardsToTake = playedCardsHistory.toList() //Cards to pick up.
 
             if (cardsToTake.isEmpty()) {
-                Toast.makeText(this, "Cannot take the first card!", Toast.LENGTH_SHORT).show()
+                // See ei tohiks tegelikult käivituda tänu eelnevale kontrollile.
+                Toast.makeText(this, "No cards to take!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             myCards.addAll(cardsToTake) //We will add these cards to your hand.
-            removeCardsFromHistory(cardsToTake) //remove the cards from the history.
+            playedCardsHistory.clear() //remove the cards from the history.
 
             checkForWinOrLoss()
 
